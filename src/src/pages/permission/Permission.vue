@@ -15,32 +15,34 @@
           <template>
             <div>
               <a-input-search style="margin-bottom: 8px" placeholder="Search" @change="onRoleSearchChange" />
-              <a-tree
-                :multiple="false"
-                show-icon
-                :defaultExpandAll="true"
-                :expandedKeys="roleExpandedKeys"
-                :autoExpandParent="autoExpandRoleParent"
-                :selected-keys="selectedRoleKeys"
-                :treeData="roleData"
-                :replaceFields="{
-                  children: 'children',
-                  title: 'label',
-                  key: 'id',
-                }"
-                @expand="onRoleTreeExpand"
-                @select="onRoleTreeSelect"
-                :icon="getIcon"
-              >
-                <template slot="label" slot-scope="{ label }">
-                  <span v-if="label.indexOf(searchRoleValue) > -1">
-                    {{ label.substr(0, label.indexOf(searchRoleValue)) }}
-                    <span style="color: #f50">{{ searchRoleValue }}</span>
-                    {{ label.substr(label.indexOf(searchRoleValue) + searchRoleValue.length) }}
-                  </span>
-                  <span v-else>{{ label }}</span>
-                </template>
-              </a-tree>
+              <div class="main-tree">
+                <a-tree
+                  :multiple="false"
+                  show-icon
+                  :defaultExpandAll="true"
+                  :expandedKeys="roleExpandedKeys"
+                  :autoExpandParent="autoExpandRoleParent"
+                  :selected-keys="selectedRoleKeys"
+                  :treeData="roleData"
+                  :replaceFields="{
+                    children: 'children',
+                    title: 'label',
+                    key: 'id',
+                  }"
+                  @expand="onRoleTreeExpand"
+                  @select="onRoleTreeSelect"
+                  :icon="getIcon"
+                >
+                  <template slot="label" slot-scope="{ label }">
+                    <span v-if="label.indexOf(searchRoleValue) > -1">
+                      {{ label.substr(0, label.indexOf(searchRoleValue)) }}
+                      <span style="color: #f50">{{ searchRoleValue }}</span>
+                      {{ label.substr(label.indexOf(searchRoleValue) + searchRoleValue.length) }}
+                    </span>
+                    <span v-else>{{ label }}</span>
+                  </template>
+                </a-tree>
+              </div>
             </div>
           </template>
         </div>
@@ -60,24 +62,26 @@
         </div>
         <div>
           <template>
-            <a-tree
-              v-model="checkedKeys"
-              checkable
-              :checkStrictly="true"
-              :disabled="disabled"
-              :expanded-keys="expandedPermissionKeys"
-              :auto-expand-parent="autoExpandPermissionParent"
-              :selected-keys="selectedKeys"
-              :tree-data="permissionData"
-              :replaceFields="{
-                children: 'children',
-                title: 'label',
-                key: 'id',
-              }"
-              @expand="onPermissionExpand"
-              @select="onPermissionSelect"
-              @check="onPermissionCheck"
-            />
+            <div class="main-tree">
+              <a-tree
+                v-model="checkedKeys"
+                checkable
+                :checkStrictly="true"
+                :disabled="disabled"
+                :expanded-keys="expandedPermissionKeys"
+                :auto-expand-parent="autoExpandPermissionParent"
+                :selected-keys="selectedKeys"
+                :tree-data="permissionData"
+                :replaceFields="{
+                  children: 'children',
+                  title: 'label',
+                  key: 'id',
+                }"
+                @expand="onPermissionExpand"
+                @select="onPermissionSelect"
+                @check="onPermissionCheck"
+              />
+            </div>
           </template>
         </div>
       </a-card>
@@ -333,6 +337,11 @@ export default {
 };
 </script>
 
-<style lang="less">
-@import "index";
+<style scoped lang="less">
+@import "index.less";
+
+.main-tree {
+  max-height: 500px;
+  overflow-y: auto;
+}
 </style>

@@ -5,6 +5,7 @@
     :visible="visible"
     :confirmLoading="loading"
     :maskClosable="false"
+    :destroyOnClose="true"
     @ok="
       () => {
         $emit('ok');
@@ -27,50 +28,40 @@
         <a-form-item label="父节点">
           <template>
             <a-cascader
-              :value="viewIdSelect"
+              :value="dictionaryIdSelect"
               ref="cascader"
               :options="options"
               change-on-select
-              @change="onViewSelectChange"
+              @change="onDictionaryIdSelectChange"
               :field-names="{ label: 'name', value: 'id', children: 'children' }"
               placeholder="请选择"
             />
           </template>
         </a-form-item>
-        <a-form-item label="名称">
-          <a-input
-            v-decorator="['name', { rules: [{ required: true, min: 2, message: '名称不能少于两个字！' }] }]"
-            placeholder="视图名称"
+        <a-form-item label="字典名称">
+          <a-input v-decorator="['name', { rules: [{ required: true }] }]" placeholder="字典名称" />
+        </a-form-item>
+        <a-form-item label="字典编码">
+          <a-input v-decorator="['code', { rules: [{ required: true }] }]" placeholder="字典编码" />
+        </a-form-item>
+        <a-form-item label="字典值">
+          <a-input v-decorator="['value', { rules: [{ required: false }] }]" placeholder="字典值" />
+        </a-form-item>
+        <a-form-item label="排序">
+          <a-input-number
+            v-decorator="['sort', { initialValue: 1 }]"
+            :min="1"
+            :max="999999999999"
+            style="width: 100%"
           />
         </a-form-item>
-        <a-form-item label="路由">
-          <a-input v-decorator="['router', { rules: [{ required: true }] }]" placeholder="路由" />
-        </a-form-item>
-        <a-form-item label="路径">
-          <a-input
-            v-decorator="['path', { rules: [{ required: false }] }]"
-            placeholder="可选，视图路径，如：/home/dashboard"
-          />
-        </a-form-item>
-        <a-form-item label="路由参数">
-          <a-input
-            v-decorator="['query', { rules: [{ required: false }] }]"
-            placeholder='可选，参数(Json格式)，如：{"id":"1"}'
-          />
-        </a-form-item>
-        <a-form-item label="页面标题">
-          <a-input
-            v-decorator="['pageTitle', { rules: [{ required: false }] }]"
-            placeholder="可选，不填则使用菜单名称"
-          />
-        </a-form-item>
-        <a-form-item label="描述">
+        <a-form-item label="描述/备注">
           <a-input
             v-decorator="['description', { rules: [{ required: false, min: 2, message: '描述不能少于两个字！' }] }]"
             placeholder="可选，描述"
           />
         </a-form-item>
-        <a-form-item label="是否启用">
+        <a-form-item label="状态">
           <a-switch v-decorator="['isEnabled', { valuePropName: 'checked', initialValue: true }]" />
         </a-form-item>
       </a-form>
@@ -80,7 +71,7 @@
 
 <script>
 import pick from "lodash.pick";
-import { GET_VIEW_CASCADER } from "@/services/api";
+import { GET_DICTIONARY_CASCADER, GET_DICTIONARY_NEXT_SORT_VALUE } from "@/services/api";
 import { request, METHOD } from "@/utils/request";
 
 export default {
@@ -98,7 +89,7 @@ export default {
     this.formLayout = {
       labelCol: {
         xs: { span: 24 },
-        sm: { span: 6 },
+        sm: { span: 7 },
       },
       wrapperCol: {
         xs: { span: 24 },
@@ -106,13 +97,13 @@ export default {
       },
     };
     return {
-      title: "创建视图",
-      fields: ["id", "parentId", "path", "name", "router", "query", "pageTitle", "description", "isEnabled"],
+      title: "新建数据字典",
+      fields: ["id", "parentId", "name", "code", "value", "sort", "description", "isEnabled"],
       loading: false,
       form: this.$form.createForm(this),
-      viewIdSelect: [],
+      dictionaryIdSelect: [],
       options: [],
-      viewListData: [],
+      dictionaryListData: [],
     };
   },
   created() {
@@ -126,70 +117,92 @@ export default {
       }
       //pick 从model中取出表单中对应值
       if (this.model.type === "update") {
+        this.title = "修改数据字典";
         this.form.setFieldsValue(pick(this.model.data, this.fields));
         this.load();
+        if (this.model.data.parentId && this.model.data.parentId > 0) {
+          this.loadMaxSort(this.model.data.parentId);
+        }
       } else {
+        this.title = "新建数据字典";
         this.load();
       }
     });
   },
   methods: {
     load() {
-      this.viewIdSelect = [];
+      this.dictionaryIdSelect = [];
       this.loading = true;
-      request(GET_VIEW_CASCADER, METHOD.GET).then((result) => {
+      let self = this;
+      request(GET_DICTIONARY_CASCADER, METHOD.GET).then((result) => {
         let resultData = result.data;
         if (resultData.code != 0) {
           return;
         }
-        this.options.splice(0);
-        this.options = resultData.data;
+        self.options.splice(0);
+        self.options = resultData.data;
+        self.dictionaryListData.splice(0);
+        self.generateDictionaryList(self.options);
+        self.setCascader();
+
         this.loading = false;
-        this.viewListData.splice(0);
-        this.generateViewList(this.options);
-        this.setCascader("parentId", this.viewListData, this.viewIdSelect);
       });
     },
-    generateViewList(data) {
+    loadMaxSort(parentId) {
+      if (!parentId || parentId == 0) {
+        this.form.setFieldsValue({ sort: 1 });
+        return;
+      }
+      request(GET_DICTIONARY_NEXT_SORT_VALUE, METHOD.GET, { parentId: parentId }).then((result) => {
+        if (result.data.code != 0) {
+          return;
+        }
+        this.form.setFieldsValue({ sort: result.data.data });
+      });
+    },
+    generateDictionaryList(data) {
       for (let i = 0; i < data.length; i++) {
-        this.viewListData.push(data[i]);
+        this.dictionaryListData.push(data[i]);
         if (data[i].children && data[i].children.length > 0) {
-          this.generateViewList(data[i].children);
+          this.generateDictionaryList(data[i].children);
         }
       }
     },
-    setCascader(fieldName, data, selectList) {
-      let parentId = this.form.getFieldValue(fieldName);
+    setCascader() {
+      let parentId = this.form.getFieldValue("parentId");
       if (!parentId || parentId <= 0) {
         return;
       }
       let parentKeys = [];
       do {
-        for (let i = 0; i < data.length; i++) {
-          if (data[i].id === parentId) {
-            parentKeys.push(data[i].id);
-            parentId = data[i].parentId;
+        for (let i = 0; i < this.dictionaryListData.length; i++) {
+          if (this.dictionaryListData[i].id === parentId) {
+            parentKeys.push(this.dictionaryListData[i].id);
+            parentId = this.dictionaryListData[i].parentId;
             break;
           }
         }
       } while (parentId != null && parentId > 0);
       if (parentKeys.length > 0) {
         for (let i = parentKeys.length - 1; i >= 0; i--) {
-          selectList.push(parentKeys[i]);
+          this.dictionaryIdSelect.push(parentKeys[i]);
         }
       }
     },
-    onViewSelectChange(value) {
-      if (value.length >= 4) {
-        this.$message.warn("视图深度不能超过4层");
+    onDictionaryIdSelectChange(value) {
+      if (value.length >= 8) {
+        this.$message.warn("字典深度不能超过7级");
         return;
       }
-      this.viewIdSelect = value;
+      this.dictionaryIdSelect = value;
+      let parentId = 0;
       if (!value || value.length == 0) {
         this.form.setFieldsValue({ parentId: 0 });
-        return;
+      } else {
+        parentId = value[value.length - 1];
+        this.form.setFieldsValue({ parentId: parentId });
       }
-      this.form.setFieldsValue({ parentId: value[value.length - 1] });
+      this.loadMaxSort(parentId);
     },
   },
 };

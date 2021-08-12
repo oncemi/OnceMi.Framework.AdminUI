@@ -37,15 +37,6 @@
             />
           </template>
         </a-form-item>
-        <a-form-item label="名称">
-          <a-input
-            v-decorator="['name', { rules: [{ required: true, min: 2, message: '名称不能少于两个字！' }] }]"
-            placeholder="菜单名称"
-          />
-        </a-form-item>
-        <a-form-item label="图标" help="图标查找：https://www.antdv.com/components/icon-cn/">
-          <a-input v-decorator="['icon', { initialValue: '' }]" placeholder="请选择图标" />
-        </a-form-item>
         <a-form-item label="类型">
           <a-select
             v-decorator="['type', { rules: [{ required: true }] }]"
@@ -88,6 +79,15 @@
               placeholder="请选择"
             />
           </template>
+        </a-form-item>
+        <a-form-item label="名称">
+          <a-input
+            v-decorator="['name', { rules: [{ required: true, min: 2, message: '名称不能少于两个字！' }] }]"
+            placeholder="菜单名称"
+          />
+        </a-form-item>
+        <a-form-item v-if="viewOrGroupSelected" label="图标" help="图标查找：https://www.antdv.com/components/icon-cn/">
+          <a-input v-decorator="['icon', { initialValue: '' }]" placeholder="请选择图标" />
         </a-form-item>
         <a-form-item label="排序">
           <a-input v-decorator="['sort', { rules: [{ required: false }] }]" placeholder="排序" />
@@ -184,7 +184,7 @@ export default {
   },
   methods: {
     loadMenuMaxSort(parentId) {
-      if (!parentId) {
+      if (!parentId || parentId == 0) {
         this.form.setFieldsValue({ sort: 1 });
         return;
       }
@@ -313,7 +313,13 @@ export default {
         this.form.setFieldsValue({ viewId: 0 });
         return;
       }
-      this.form.setFieldsValue({ viewId: value[value.length - 1] });
+      let viewId = value[value.length - 1];
+      this.form.setFieldsValue({ viewId: viewId });
+      //set form name
+      let viewInfo = this.searchItemOnList(this.viewListData, viewId);
+      if (viewInfo && viewInfo.name) {
+        this.form.setFieldsValue({ name: viewInfo.name });
+      }
     },
     onApiIdChange(value) {
       this.apiIdSelect = value;
@@ -321,18 +327,36 @@ export default {
         this.form.setFieldsValue({ apiId: 0 });
         return;
       }
-      this.form.setFieldsValue({ apiId: value[value.length - 1] });
+      let apiId = value[value.length - 1];
+      this.form.setFieldsValue({ apiId: apiId });
+      //set form name
+      let apiInfo = this.searchItemOnList(this.apiListData, apiId);
+      if (apiInfo && apiInfo.name) {
+        this.form.setFieldsValue({ name: apiInfo.name });
+      }
     },
     onTypeChange(value) {
       if (value == 1 || value == 3) {
+        //视图或分组
         this.viewOrGroupSelected = true;
         this.apiSelected = false;
       } else if (value == 2) {
+        //接口
         this.viewOrGroupSelected = false;
         this.apiSelected = true;
       } else {
         this.viewOrGroupSelected = false;
         this.apiSelected = false;
+      }
+    },
+    searchItemOnList(source, value) {
+      if (!source || !value) {
+        return null;
+      }
+      for (let i = 0; i < source.length; i++) {
+        if (source[i].id && source[i].id == value) {
+          return source[i];
+        }
       }
     },
   },

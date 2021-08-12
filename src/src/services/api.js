@@ -56,4 +56,38 @@ module.exports = {
   DELETE_USER_ITEM: `${BASE_URL}/api/v1/User`,
   POST_USER_ITEM: `${BASE_URL}/api/v1/User`,
   PUT_USER_ITEM: `${BASE_URL}/api/v1/User`,
+  PUT_USER_PWSSWORD: `${BASE_URL}/api/v1/User/UpdateUserPassword`,
+  GET_USER_STATUS: `${BASE_URL}/api/v1/User/UserStatusSelectList`,
+  GET_USER_GENDER: `${BASE_URL}/api/v1/User/UserGenderSelectList`,
+  //Job
+  GET_JOB_LIST: `${BASE_URL}/api/v1/Job`,
+  DELETE_JOB_ITEM: `${BASE_URL}/api/v1/Job`,
+  POST_JOB_ITEM: `${BASE_URL}/api/v1/Job`,
+  PUT_JOB_ITEM: `${BASE_URL}/api/v1/Job`,
+  POST_START_JOB: `${BASE_URL}/api/v1/Job/Start`,
+  POST_STOP_JOB: `${BASE_URL}/api/v1/Job/Stop`,
+  POST_PAUSE_JOB: `${BASE_URL}/api/v1/Job/Pause`,
+  POST_RESUME_JOB: `${BASE_URL}/api/v1/Job/Resume`,
+  POST_TRIGGER_JOB: `${BASE_URL}/api/v1/Job/Trigger`,
+  //JobGroup
+  GET_JOB_GROUP_LIST: `${BASE_URL}/api/v1/JobGroup`,
+  DELETE_JOB_GROUP_ITEM: `${BASE_URL}/api/v1/JobGroup`,
+  POST_JOB_GROUP_ITEM: `${BASE_URL}/api/v1/JobGroup`,
+  PUT_JOB_GROUP_ITEM: `${BASE_URL}/api/v1/JobGroup`,
+  GET_JOB_GROUP_SELECT_LIST: `${BASE_URL}/api/v1/JobGroup/SelectList`,
+  //JobHistory
+  GET_JOB_HISTORY_LIST: `${BASE_URL}/api/v1/JobHistory`,
+  //Dictionary
+  GET_DICTIONARY_TREE: `${BASE_URL}/api/v1/Dictionary/DictionaryTreeList`,
+  GET_DICTIONARY_ITEM: `${BASE_URL}/api/v1/Dictionary/Detail`,
+  DELETE_DICTIONARY_ITEM: `${BASE_URL}/api/v1/Dictionary`,
+  POST_DICTIONARY_ITEM: `${BASE_URL}/api/v1/Dictionary`,
+  PUT_DICTIONARY_ITEM: `${BASE_URL}/api/v1/Dictionary`,
+  GET_DICTIONARY_CASCADER: `${BASE_URL}/api/v1/Dictionary/CascaderList`,
+  GET_DICTIONARY_NEXT_SORT_VALUE: `${BASE_URL}/api/v1/Dictionary/GetNextSortValue`,
+  //File
+  GET_FILE_LIST: `${BASE_URL}/api/v1/File/QueryByPage`,
+  POST_FILE_ITEM: `${BASE_URL}/api/v1/File`,
+  DELETE_FILE_ITEM: `${BASE_URL}/api/v1/File`,
+  GET_FILE_ACCESSMODE_SELECTLIST: `${BASE_URL}/api/v1/File/AccessModeSelectList`,
 };

@@ -9,7 +9,7 @@ const view = {
 const routerMap = {
   root: {
     path: "/",
-    name: "首页",
+    name: "Admin",
     redirect: "/login",
     component: view.tabs,
   },
@@ -60,6 +60,26 @@ const routerMap = {
   cache: {
     name: "缓存管理",
     component: () => import("@/pages/cache/Cache"),
+  },
+  job: {
+    name: "作业管理",
+    component: () => import("@/pages/job/Job"),
+  },
+  dictionary: {
+    name: "数据字典",
+    component: () => import("@/pages/dictionary/Dictionary"),
+  },
+  files: {
+    name: "文件管理",
+    component: () => import("@/pages/files/Files"),
+  },
+  personal: {
+    name: "个人中心",
+    component: view.page,
+  },
+  profile: {
+    name: "个人信息",
+    component: () => import("@/pages/profile/Profile"),
   },
   exception: {
     name: "异常页",

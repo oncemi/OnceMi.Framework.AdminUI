@@ -48,8 +48,8 @@
               field="img"
               @crop-success="cropSuccess"
               v-model="showAvatarUploadForm"
-              :width="250"
-              :height="250"
+              :width="150"
+              :height="150"
               img-format="png"
             ></avatarUpload>
           </a-col>
@@ -76,11 +76,8 @@
                 v-decorator="['status', { rules: [{ required: true }], initialValue: 'Enable' }]"
                 placeholder="用户状态"
               >
-                <a-select-option value="Enable">
-                  启用
-                </a-select-option>
-                <a-select-option value="Disable">
-                  禁用
+                <a-select-option v-for="item in statusSelectList" :key="item.value">
+                  {{ item.name }}
                 </a-select-option>
               </a-select>
             </a-form-item>
@@ -99,17 +96,8 @@
           <a-col :span="12" class="input-col">
             <a-form-item label="性别">
               <a-select v-decorator="['gender', { rules: [{ required: false }] }]" placeholder="请选择">
-                <a-select-option value="">
-                  请选择
-                </a-select-option>
-                <a-select-option value="Male">
-                  男
-                </a-select-option>
-                <a-select-option value="Female">
-                  女
-                </a-select-option>
-                <a-select-option value="All">
-                  其它
+                <a-select-option v-for="item in genderSelectList" :key="item.value">
+                  {{ item.name }}
                 </a-select-option>
               </a-select>
             </a-form-item>
@@ -214,7 +202,7 @@
 
 <script>
 import pick from "lodash.pick";
-import { GET_ORGANIZE_CASCADER, GET_ROLE_CASCADER } from "@/services/api";
+import { GET_ORGANIZE_CASCADER, GET_ROLE_CASCADER, GET_USER_STATUS, GET_USER_GENDER } from "@/services/api";
 import { request, METHOD } from "@/utils/request";
 import imgUpload from "vue-image-crop-upload/upload-2.vue";
 import { TreeSelect } from "ant-design-vue";
@@ -267,6 +255,10 @@ export default {
       //role tree data
       roleSelect: [],
       roleTreeData: [],
+      //状态下拉框
+      statusSelectList: [],
+      //识别下拉框
+      genderSelectList: [],
     };
   },
   created() {
@@ -342,7 +334,25 @@ export default {
               this.searchSelectItem(this.roleTreeData, modelRoles, this.roleSelect);
             }
           }
-          this.loading = false;
+          request(GET_USER_STATUS, METHOD.GET).then((statusResult) => {
+            if (statusResult.data.code != 0) {
+              return;
+            }
+            this.statusSelectList.splice(0);
+            statusResult.data.data.forEach((r) => {
+              this.statusSelectList.push(r);
+            });
+            request(GET_USER_GENDER, METHOD.GET).then((genderResult) => {
+              if (genderResult.data.code != 0) {
+                return;
+              }
+              this.genderSelectList.splice(0);
+              genderResult.data.data.forEach((r) => {
+                this.genderSelectList.push(r);
+              });
+              this.loading = false;
+            });
+          });
         });
       });
     },

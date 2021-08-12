@@ -38,7 +38,7 @@
           :pagination="pagination"
           :sortDirections="['descend', 'ascend']"
           :loading="loading"
-          :scroll="{ scrollToFirstRowOnChange: true, x: 800, y: 580 }"
+          :scroll="{ scrollToFirstRowOnChange: true, x: 800, y: 500 }"
           rowKey="value"
           @change="onChange"
         >
@@ -153,13 +153,20 @@ export default {
         title: "此操作将清除" + records.value + "下的所有缓存，确认吗？",
         content: "“{xxx}”表示通配符",
         onOk() {
-          return request(DELETE_CACHE_LIST, METHOD.DELETE, {
-            Value: records.value,
-          }).then((result) => {
-            if (result.data.code != 0) {
-              return;
-            }
-            self.$message.success("清理完成，共清理了" + result.data.data.count + "条缓存");
+          return new Promise((resolve, reject) => {
+            return request(DELETE_CACHE_LIST, METHOD.DELETE, {
+              Value: records.value,
+            }).then((result) => {
+              if (result.data.code != 0) {
+                reject();
+                return;
+              }
+              resolve();
+              self.$message.success("清理完成，共清理了" + result.data.data.count + "条缓存");
+            });
+          }).catch((err) => {
+            this.$message.error(err.message);
+            console.error(err);
           });
         },
         onCancel() {},

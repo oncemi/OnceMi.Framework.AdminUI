@@ -226,7 +226,6 @@ export default {
         {
           title: "所属机构",
           dataIndex: "organizes",
-          scopedSlots: { customRender: "organizes" },
           customRender: (value, row, index) => {
             if (!value || value.length == 0) {
               return "";
@@ -570,13 +569,19 @@ export default {
         title: message,
         content: "注意：将删除节点与节点下面的所有子节点！",
         onOk() {
-          return request(DELETE_USER_ITEM, METHOD.DELETE, delArgs).then((result) => {
-            let resultData = result.data;
-            if (resultData.code != 0) {
-              return;
-            }
-            self.$message.success("删除成功");
-            self.loadUser();
+          return new Promise((resolve, reject) => {
+            return request(DELETE_USER_ITEM, METHOD.DELETE, delArgs).then((result) => {
+              let resultData = result.data;
+              if (resultData.code != 0) {
+                reject();
+                return;
+              }
+              self.loadUser();
+              resolve();
+              self.$message.success("删除成功");
+            });
+          }).catch((err) => {
+            this.$message.error(err.message);
           });
         },
         onCancel() {},

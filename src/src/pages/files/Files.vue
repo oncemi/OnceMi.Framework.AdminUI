@@ -4,13 +4,12 @@
       <a-form layout="horizontal">
         <div :class="advanced ? null : 'fold'">
           <a-row>
-            <a-col :md="8" :sm="24" style="margin-right: 8px">
-              <a-form-item label="API版本" :labelCol="{ span: 5 }" :wrapperCol="{ span: 18, offset: 1 }">
-                <a-select v-model="paramApiVersion" placeholder="请选择">
+            <a-col :md="8" :sm="24" v-if="false">
+              <a-form-item label="类型" :labelCol="{ span: 5 }" :wrapperCol="{ span: 18, offset: 1 }">
+                <a-select v-model="paramTypes" placeholder="请选择">
                   <a-select-option value="">请选择</a-select-option>
-                  <a-select-option v-for="item in apiVersionsSelectList" :key="item.value" :value="item.value">
-                    {{ item.name }}
-                  </a-select-option>
+                  <a-select-option value="1">启用</a-select-option>
+                  <a-select-option value="2">禁用</a-select-option>
                 </a-select>
               </a-form-item>
             </a-col>
@@ -33,14 +32,12 @@
     </div>
     <div>
       <a-space class="operator">
-        <a-button @click="add" type="primary">新建</a-button>
+        <a-button @click="add" type="primary">上传</a-button>
         <a-button @click="deleteSelectItems" type="danger">删除</a-button>
-        <a-button @click="resolve">同步</a-button>
       </a-space>
       <div>
         <a-table
           :row-selection="{ selectedRowKeys: selectedRowKeys, onChange: onSelectChange }"
-          :expanded-row-keys.sync="expandedRowKeys"
           :columns="columns"
           :data-source="data"
           :pagination="pagination"
@@ -49,7 +46,6 @@
           :scroll="{ scrollToFirstRowOnChange: true, x: 1200, y: 500 }"
           rowKey="id"
           @change="onChange"
-          @expand="onExpand"
         >
           <span slot="ellipsisCol" slot-scope="text">
             <a-tooltip placement="topLeft">
@@ -66,8 +62,8 @@
           </span>
           <span slot="options" slot-scope="text, record">
             <div>
-              <a-button type="primary" size="small" @click="edit(record)" :style="{ 'margin-right': '6px' }"
-                >编辑</a-button
+              <a-button type="primary" size="small" @click="download(record)" :style="{ 'margin-right': '6px' }"
+                >下载</a-button
               >
               <a-button type="danger" size="small" @click="deleteWithConfirm(record)">删除</a-button>
             </div>
@@ -80,18 +76,13 @@
 </template>
 
 <script>
-import {
-  GET_API_LIST,
-  DELETE_API_ITEM,
-  POST_API_ITEM,
-  PUT_API_ITEM,
-  RESOLVE_API_ITEM,
-  GET_APIVERSION_SELECTLIST,
-} from "@/services/api";
+import { GET_FILE_LIST, DELETE_FILE_ITEM } from "@/services/api";
 import { request, METHOD } from "@/utils/request";
+import { mapState } from "vuex";
 import CreateForm from "./modules/CreateForm";
+
 export default {
-  name: "ApiManagement",
+  name: "FilesManagement",
   i18n: require("./i18n"),
   components: {
     CreateForm,
@@ -104,39 +95,46 @@ export default {
       columns: [
         {
           title: "名称",
-          dataIndex: "name",
-          width: 230,
-        },
-        {
-          title: "路径",
-          dataIndex: "path",
-        },
-        {
-          title: "版本",
-          dataIndex: "version",
-          width: 80,
-        },
-        {
-          title: "请求方式",
-          dataIndex: "method",
-          width: 100,
-        },
-        {
-          title: "权限",
-          dataIndex: "code",
+          dataIndex: "oldName",
           ellipsis: true,
           scopedSlots: { customRender: "ellipsisCol" },
         },
         {
-          title: "状态",
-          dataIndex: "isEnabled",
-          scopedSlots: { customRender: "status" },
-          width: 80,
+          title: "储存名称",
+          dataIndex: "name",
+          ellipsis: true,
+          scopedSlots: { customRender: "ellipsisCol" },
         },
         {
-          title: "创建时间",
+          title: "文件路径",
+          dataIndex: "path",
+          ellipsis: true,
+          scopedSlots: { customRender: "ellipsisCol" },
+        },
+        {
+          title: "大小(KB)",
+          dataIndex: "size",
+        },
+        {
+          title: "储存类型",
+          dataIndex: "storageTypeName",
+        },
+        {
+          title: "储存桶",
+          dataIndex: "bucketName",
+        },
+        {
+          title: "访问权限",
+          dataIndex: "accessModeName",
+        },
+        {
+          title: "上传时间",
           dataIndex: "createdTime",
           sorter: true,
+        },
+        {
+          title: "所有人",
+          dataIndex: "ownerName",
         },
         {
           title: "操作",
@@ -146,7 +144,6 @@ export default {
         },
       ],
       selectedRowKeys: [],
-      expandedRowKeys: [],
       loading: true,
       pageSize: 10,
       page: 1,
@@ -165,8 +162,7 @@ export default {
           this.page = page;
         },
       },
-      apiVersionsSelectList: [],
-      paramApiVersion: "",
+      paramTypes: "",
       paramKeyword: "",
       //添加/修改弹窗
       visible: false,
@@ -184,34 +180,19 @@ export default {
   authorize: {
     deleteRecord: "delete",
   },
-  computed: {
-    desc() {
-      return this.$t("description");
-    },
-  },
   created() {
-    this.loadApiVersions();
     this.load();
   },
+  computed: {
+    ...mapState("account", ["user"]),
+  },
   methods: {
-    loadApiVersions() {
-      request(GET_APIVERSION_SELECTLIST, METHOD.GET).then((orgResult) => {
-        if (orgResult.data.code != 0) {
-          return;
-        }
-        this.apiVersionsSelectList.splice(0);
-        orgResult.data.data.forEach((r) => {
-          this.apiVersionsSelectList.push(r);
-        });
-      });
-    },
     load() {
       this.loading = true;
-      request(GET_API_LIST, METHOD.GET, {
+      request(GET_FILE_LIST, METHOD.GET, {
         page: this.page,
         size: this.pageSize,
         search: this.paramKeyword ?? this.paramKeyword,
-        apiVersion: this.paramApiVersion ?? this.paramApiVersion,
         orderby:
           typeof this.orderFiled != "undefined" && this.orderFiled.length > 0 ? `${this.orderFiled},${this.sort}` : "",
       })
@@ -220,100 +201,49 @@ export default {
           if (resultData.code != 0) {
             return;
           }
-
           this.data.splice(0);
           this.selectedRowKeys.splice(0);
-          this.expandedRowKeys.splice(0);
-
-          this.formatData(resultData.data.pageData);
           this.data = resultData.data.pageData;
           this.pagination.total = result.data.data.count;
           this.loading = false;
         })
-        .catch(() => {
+        .catch((err) => {
+          console.error(err);
           this.loading = false;
         });
     },
     reset() {
-      this.paramApiVersion = "";
+      this.paramTypes = "";
       this.paramKeyword = "";
       this.load();
     },
-    resolve() {
-      let self = this;
-      this.$confirm({
-        title: "同步系统API?",
-        content: "将自动发现系统中的API并同步到数据库中。",
-        onOk() {
-          return request(RESOLVE_API_ITEM, METHOD.POST).then((result) => {
-            if (result.data.code != 0) {
-              return;
-            }
-            self.$message.success("接口同步成功");
-            self.load();
-          });
-        },
-        onCancel() {},
-      });
-    },
-    add() {
+    async add() {
       this.visible = true;
       this.$nextTick(() => {
-        this.mdl = { type: "create", data: null };
+        this.mdl = {
+          type: "update",
+          data: {
+            userId: this.user.id,
+            accessMode: "PublicRead",
+          },
+        };
       });
     },
-    edit(record) {
-      this.visible = true;
-      this.$nextTick(() => {
-        this.mdl = { type: "update", data: record };
-      });
+    download(record) {
+      //下载
+      if (!record || !record.url || record.url.length == 0) {
+        this.$message.warning("下载失败，无法获取文件URL");
+        return;
+      }
+      window.open(record.url);
     },
     save() {
       const form = this.$refs.createModal.form;
       this.$refs.createModal.loading = true;
       form.validateFields((errors, values) => {
         if (!errors) {
-          if (values.parentId && (!values.method || values.method.length <= 0)) {
-            this.$message.warning("当Api不为根节点（控制器）时，请求方式不能为空");
-            this.$refs.createModal.loading = false;
-            return;
-          }
-          if (values.id > 0) {
-            // 修改 e.g.
-            request(PUT_API_ITEM, METHOD.PUT, values)
-              .then((result) => {
-                if (result.data.code != 0) {
-                  this.$refs.createModal.loading = false;
-                  return;
-                }
-                this.load();
-                this.visible = false;
-                this.$refs.createModal.loading = false;
-                // 重置表单数据
-                form.resetFields();
-                this.$message.success("接口修改成功");
-              })
-              .catch(() => {
-                this.$refs.createModal.loading = false;
-              });
-          } else {
-            request(POST_API_ITEM, METHOD.POST, values)
-              .then((result) => {
-                if (result.data.code != 0) {
-                  this.$refs.createModal.loading = false;
-                  return;
-                }
-                this.load();
-                this.visible = false;
-                this.$refs.createModal.loading = false;
-                // 重置表单数据
-                form.resetFields();
-                this.$message.success("接口创建成功");
-              })
-              .catch(() => {
-                this.$refs.createModal.loading = false;
-              });
-          }
+          this.load();
+          return;
         } else {
           this.$refs.createModal.loading = false;
         }
@@ -323,6 +253,7 @@ export default {
       this.visible = false;
       const form = this.$refs.createModal.form;
       form.resetFields(); // 清理表单数据（可不做）
+      this.load();
     },
     deleteSelectItems() {
       //
@@ -343,15 +274,15 @@ export default {
           delArgs.push(item);
         });
       } else {
-        message = `确认删除“${records.name}”吗？`;
+        message = `确认删除文件“${records.oldName}”吗？`;
         delArgs.push(records.id);
       }
       self.$confirm({
         title: message,
-        content: "注意：将删除节点与节点下面的所有子节点！",
+        content: "注意：文件删除后无法恢复！",
         onOk() {
           return new Promise((resolve, reject) => {
-            return request(DELETE_API_ITEM, METHOD.DELETE, delArgs).then((result) => {
+            return request(DELETE_FILE_ITEM, METHOD.DELETE, delArgs).then((result) => {
               let resultData = result.data;
               if (resultData.code != 0) {
                 reject();
@@ -395,35 +326,10 @@ export default {
         this.load();
       }
     },
-    onExpand(expanded, record) {
-      let index = this.expandedRowKeys.indexOf(record.id);
-      if (expanded == true) {
-        if (index == -1) {
-          this.expandedRowKeys.push(record.id);
-        }
-      } else {
-        if (index > -1) {
-          this.expandedRowKeys.splice(index, 1);
-        }
-      }
-    },
-    formatData(data) {
-      if (typeof data == "undefined" || data.length == 0) {
-        return;
-      }
-      for (let i = 0; i < data.length; i++) {
-        if (data[i].children.length > 0) {
-          this.expandedRowKeys.push(data[i].id);
-          this.formatData(data[i].children);
-        } else {
-          data[i].children = null;
-        }
-      }
-    },
   },
 };
 </script>
 
 <style scoped lang="less">
-@import "index.less";
+@import "index";
 </style>

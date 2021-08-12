@@ -44,11 +44,19 @@
           :pagination="pagination"
           :sortDirections="['descend', 'ascend']"
           :loading="loading"
-          :scroll="{ scrollToFirstRowOnChange: true, x: 1200, y: 580 }"
+          :scroll="{ scrollToFirstRowOnChange: true, x: 1200, y: 500 }"
           rowKey="id"
           @change="onChange"
           @expand="onExpand"
         >
+          <span slot="ellipsisCol" slot-scope="text">
+            <a-tooltip placement="topLeft">
+              <template slot="title">
+                {{ text }}
+              </template>
+              {{ text }}
+            </a-tooltip>
+          </span>
           <span slot="icon" slot-scope="icon">
             <a-icon v-if="icon" :type="icon" />
           </span>
@@ -92,7 +100,6 @@ export default {
           title: "名称",
           dataIndex: "name",
           width: 250,
-          fixed: "left",
         },
         {
           title: "图标",
@@ -109,11 +116,13 @@ export default {
           title: "排序",
           dataIndex: "sort",
           width: 80,
+          sorter: true,
         },
         {
           title: "路径",
           dataIndex: "path",
           ellipsis: true,
+          scopedSlots: { customRender: "ellipsisCol" },
         },
         {
           title: "状态",
@@ -253,7 +262,7 @@ export default {
                 this.$refs.createModal.loading = false;
                 // 重置表单数据
                 form.resetFields();
-                this.$message.success("视图修改成功");
+                this.$message.success("菜单修改成功");
               })
               .catch(() => {
                 this.$refs.createModal.loading = false;
@@ -270,7 +279,7 @@ export default {
                 this.$refs.createModal.loading = false;
                 // 重置表单数据
                 form.resetFields();
-                this.$message.success("视图创建成功");
+                this.$message.success("菜单创建成功");
               })
               .catch(() => {
                 this.$refs.createModal.loading = false;
@@ -312,13 +321,19 @@ export default {
         title: message,
         content: "注意：将删除节点与节点下面的所有子节点！",
         onOk() {
-          return request(DELETE_MENU_ITEM, METHOD.DELETE, delArgs).then((result) => {
-            let resultData = result.data;
-            if (resultData.code != 0) {
-              return;
-            }
-            self.$message.success("删除成功");
-            self.load();
+          return new Promise((resolve, reject) => {
+            return request(DELETE_MENU_ITEM, METHOD.DELETE, delArgs).then((result) => {
+              let resultData = result.data;
+              if (resultData.code != 0) {
+                reject();
+                return;
+              }
+              self.load();
+              resolve();
+              self.$message.success("删除成功");
+            });
+          }).catch((err) => {
+            this.$message.error(err.message);
           });
         },
         onCancel() {},

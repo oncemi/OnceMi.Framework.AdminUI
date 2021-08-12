@@ -30,7 +30,9 @@ const resperr = {
     const { response } = error;
     if (!response || !response.data) {
       message.error(
-        !response ? `请求数据失败，服务器返回内容为空` : `请求数据失败（Status:${response.status}），服务器返回内容为空`
+        !response
+          ? `请求数据失败，服务器返回内容为空或网络异常`
+          : `请求数据失败（Status:${response.status}），服务器返回内容为空或网络异常`
       );
       return Promise.reject(error);
     }

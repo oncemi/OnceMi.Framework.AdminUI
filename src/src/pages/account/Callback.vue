@@ -20,17 +20,13 @@ export default {
     let self = this;
     userManager.signinRedirectCallback().then(
       function(user) {
-        window.history.replaceState(
-          {},
-          window.document.title,
-          window.location.origin + window.location.pathname
-        );
+        window.history.replaceState({}, window.document.title, window.location.origin + window.location.pathname);
         if (!user) {
           this.$router.push("/500");
           this.error = "登录失败，获取用户信息失败！";
           return;
         }
-        console.log(JSON.stringify(user));
+        //console.log(JSON.stringify(user));
         //设置请求认证
         setAuthorization(user);
         self.afterLogin();
@@ -59,9 +55,7 @@ export default {
                 if (result1.data && result1.data.code == 0) {
                   this.logging = true;
                   loadRoutes(result1.data.data);
-                  const redirect = self.$route.query?.redirect
-                    ? self.$route.query.redirect
-                    : "/dashboard/analysis";
+                  const redirect = self.$route.query?.redirect ? self.$route.query.redirect : "/dashboard/analysis";
                   self.$router.push(redirect);
                   self.$message.success("登录成功，欢迎回来", 3);
                 } else {

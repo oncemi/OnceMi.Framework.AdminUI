@@ -44,7 +44,7 @@
           :pagination="pagination"
           :sortDirections="['descend', 'ascend']"
           :loading="loading"
-          :scroll="{ scrollToFirstRowOnChange: true, x: 1200, y: 580 }"
+          :scroll="{ scrollToFirstRowOnChange: true, x: 1200, y: 500 }"
           rowKey="id"
           @change="onChange"
           @expand="onExpand"
@@ -89,7 +89,6 @@ export default {
           title: "名称",
           dataIndex: "name",
           width: 250,
-          fixed: "left",
         },
         {
           title: "路由",
@@ -313,13 +312,19 @@ export default {
         title: message,
         content: "注意：将删除节点与节点下面的所有子节点！",
         onOk() {
-          return request(DELETE_VIEW_ITEM, METHOD.DELETE, delArgs).then((result) => {
-            let resultData = result.data;
-            if (resultData.code != 0) {
-              return;
-            }
-            self.$message.success("删除成功");
-            self.load();
+          return new Promise((resolve, reject) => {
+            return request(DELETE_VIEW_ITEM, METHOD.DELETE, delArgs).then((result) => {
+              let resultData = result.data;
+              if (resultData.code != 0) {
+                reject();
+                return;
+              }
+              resolve();
+              self.load();
+              self.$message.success("删除成功");
+            });
+          }).catch((err) => {
+            this.$message.error(err.message);
           });
         },
         onCancel() {},
