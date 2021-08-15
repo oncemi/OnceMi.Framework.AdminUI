@@ -125,9 +125,11 @@ export default {
       }
       //pick 从model中取出表单中对应值
       if (this.model.type === "update") {
+        this.title = "编辑接口";
         this.form.setFieldsValue(pick(this.model.data, this.fields));
         this.load();
       } else {
+        this.title = "创建接口";
         this.load();
       }
     });

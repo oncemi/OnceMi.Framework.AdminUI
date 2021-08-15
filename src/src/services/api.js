@@ -4,7 +4,7 @@
 const BASE_URL = process.env.VUE_APP_API_BASE_URL;
 module.exports = {
   ROUTES: `${BASE_URL}/api/v1/Menu/QueryViewMenu`,
-  GETAVATAR: `${BASE_URL}/api/v1/User/GetAvatar`,
+  GETAVATAR: `${BASE_URL}/api/v1/User/Avatar`,
   GET_USER_ROLE_PERMISSION: `${BASE_URL}/api/v1/Permission/QueryUserRolePermission`, //角色权限列表
   //Permission
   GET_PERMISSION_LIST: `${BASE_URL}/api/v1/Permission`, //授权列表
@@ -53,6 +53,7 @@ module.exports = {
   DELETE_CACHE_LIST: `${BASE_URL}/api/v1/Cache`,
   //User
   GET_USER_LIST: `${BASE_URL}/api/v1/User`,
+  GET_USER_INFO: `${BASE_URL}/api/v1/User`,
   DELETE_USER_ITEM: `${BASE_URL}/api/v1/User`,
   POST_USER_ITEM: `${BASE_URL}/api/v1/User`,
   PUT_USER_ITEM: `${BASE_URL}/api/v1/User`,

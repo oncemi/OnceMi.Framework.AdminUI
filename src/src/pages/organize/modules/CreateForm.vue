@@ -157,6 +157,7 @@ export default {
       }
       //pick 从model中取出表单中对应值
       if (this.model.type === "update") {
+        this.title = "编辑组织机构";
         let departLeaders = [];
         for (let i = 0; i < this.model.data.departLeaders.length; i++) {
           departLeaders.push(this.model.data.departLeaders[i].user.id);
@@ -171,6 +172,7 @@ export default {
         this.form.setFieldsValue(pick(this.model.data, this.fields));
         this.load();
       } else {
+        this.title = "新建组织机构";
         this.load();
       }
     });

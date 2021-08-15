@@ -49,7 +49,7 @@ const resperr = {
         message.error("请求失败，请先登录");
         break;
       case 403:
-        message.error("请求失败，权限不足");
+        message.error("请求失败，没有执行此操作的权限");
         break;
       case 404:
         message.error("请求失败（404 Not Found），请检查接口配置是否正确或联系管理员");

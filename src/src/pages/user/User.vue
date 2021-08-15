@@ -455,7 +455,7 @@ export default {
     edit(record) {
       this.visible = true;
       this.$nextTick(() => {
-        this.mdl = { type: "update", data: record };
+        this.mdl = { type: "update", hidePwd: false, data: record };
       });
     },
     save() {

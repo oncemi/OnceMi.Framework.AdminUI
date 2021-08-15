@@ -1,33 +1,36 @@
 <template>
   <a-tabs default-active-key="1" tab-position="left" type="card" size="large">
     <a-tab-pane key="1" tab="个人信息">
-      <a-card :bordered="false">
-        <detail-list title="退款详情">
-          <detail-list-item term="取货单号">1000000000</detail-list-item>
-          <detail-list-item term="状态">已取货</detail-list-item>
-          <detail-list-item term="销售单号">987654321</detail-list-item>
-          <detail-list-item term="子订单">1234567890</detail-list-item>
-        </detail-list>
-        <a-divider style="margin-bottom: 32px" />
+      <a-card :bordered="false" :loading="loading">
         <detail-list title="用户信息">
-          <detail-list-item term="用户姓名">付小小</detail-list-item>
-          <detail-list-item term="联系电话">18100000001</detail-list-item>
-          <detail-list-item term="常用快递">菜鸟仓储</detail-list-item>
-          <detail-list-item term="取货地址">浙江省杭州市西湖区万塘路19号</detail-list-item>
-          <detail-list-item term="备注">无</detail-list-item>
+          <detail-list-item term="">
+            <a-avatar :size="80" icon="user" :src="getUserAvatar(userInfo)" shape="square" />
+          </detail-list-item>
+          <br />
+          <a-divider style="margin-bottom: 32px" />
+          <detail-list-item term="用户编号">{{ userInfo.id }}</detail-list-item>
+          <detail-list-item term="用户账号">{{ userInfo.userName }}</detail-list-item>
+          <detail-list-item term="用户昵称/姓名">{{ userInfo.nickName }}</detail-list-item>
+          <detail-list-item term="出生日期">{{ getUserBirthDay(userInfo) }}</detail-list-item>
+          <detail-list-item term="地址">{{ userInfo.address }}</detail-list-item>
+          <detail-list-item term="性别">{{ getUserGander(userInfo) }}</detail-list-item>
+          <detail-list-item term="所在部门">{{ getUserOrganizes(userInfo) }}</detail-list-item>
+          <detail-list-item term="用户角色">{{ getUserRoles(userInfo) }}</detail-list-item>
+          <detail-list-item term="电话号码">{{ userInfo.phoneNumber }}</detail-list-item>
+          <detail-list-item term="号码已验证">
+            {{ userInfo.phoneNumber && userInfo.phoneNumber.length > 0 && userInfo.phoneNumberConfirmed ? "是" : "否" }}
+          </detail-list-item>
+          <detail-list-item term="电子邮箱">{{ userInfo.email }}</detail-list-item>
+          <detail-list-item term="邮箱已验证">
+            {{ userInfo.email && userInfo.email.length > 0 && userInfo.emailConfirmed ? "是" : "否" }}
+          </detail-list-item>
+          <detail-list-item term="创建时间">{{ userInfo.createdTime }}</detail-list-item>
         </detail-list>
         <a-divider style="margin-bottom: 32px" />
-        <div class="title">退货商品</div>
-        <a-table
-          row-key="id"
-          style="margin-bottom: 24px"
-          :columns="goodsColumns"
-          :dataSource="goodsData"
-          :pagination="false"
-        >
-        </a-table>
-        <div class="title">退货进度</div>
-        <a-table :columns="scheduleColumns" :dataSource="scheduleData" :pagination="false"> </a-table>
+        <a-button type="primary" @click="edit">
+          修改信息
+        </a-button>
+        <create-form ref="createModal" :visible="visible" :model="mdl" @cancel="cancel" @ok="save" />
       </a-card>
     </a-tab-pane>
     <a-tab-pane key="2" tab="密码修改" force-render>
@@ -76,160 +79,20 @@
 </template>
 
 <script>
-import { PUT_USER_PWSSWORD } from "@/services/api";
+import moment from "moment";
+import { PUT_USER_PWSSWORD, GET_USER_INFO, PUT_USER_ITEM } from "@/services/api";
 import { request, METHOD } from "@/utils/request";
 import sha256 from "js-sha256";
 import { mapState } from "vuex";
 import DetailList from "../../components/tool/DetailList";
 import PageLayout from "../../layouts/PageLayout";
+import CreateForm from "../user/modules/CreateForm";
 
 const DetailListItem = DetailList.Item;
 
-const goodsColumns = [
-  {
-    title: "商品编号",
-    dataIndex: "id",
-    key: "id",
-  },
-  {
-    title: "商品名称",
-    dataIndex: "name",
-    key: "name",
-  },
-  {
-    title: "商品条码",
-    dataIndex: "barcode",
-    key: "barcode",
-  },
-  {
-    title: "单价",
-    dataIndex: "price",
-    key: "price",
-    align: "right",
-  },
-  {
-    title: "数量（件）",
-    dataIndex: "num",
-    key: "num",
-    align: "right",
-  },
-  {
-    title: "金额",
-    dataIndex: "amount",
-    key: "amount",
-    align: "right",
-  },
-];
-
-const goodsData = [
-  {
-    id: "1234561",
-    name: "矿泉水 550ml",
-    barcode: "12421432143214321",
-    price: "2.00",
-    num: "1",
-    amount: "2.00",
-  },
-  {
-    id: "1234562",
-    name: "凉茶 300ml",
-    barcode: "12421432143214322",
-    price: "3.00",
-    num: "2",
-    amount: "6.00",
-  },
-  {
-    id: "1234563",
-    name: "好吃的薯片",
-    barcode: "12421432143214323",
-    price: "7.00",
-    num: "4",
-    amount: "28.00",
-  },
-  {
-    id: "1234564",
-    name: "特别好吃的蛋卷",
-    barcode: "12421432143214324",
-    price: "8.50",
-    num: "3",
-    amount: "25.50",
-  },
-];
-
-const scheduleColumns = [
-  {
-    title: "时间",
-    dataIndex: "time",
-    key: "time",
-  },
-  {
-    title: "当前进度",
-    dataIndex: "rate",
-    key: "rate",
-  },
-  {
-    title: "状态",
-    dataIndex: "status",
-    key: "status",
-  },
-  {
-    title: "操作员ID",
-    dataIndex: "operator",
-    key: "operator",
-  },
-  {
-    title: "耗时",
-    dataIndex: "cost",
-    key: "cost",
-  },
-];
-
-const scheduleData = [
-  {
-    key: "1",
-    time: "2017-10-01 14:10",
-    rate: "联系客户",
-    status: "processing",
-    operator: "取货员 ID1234",
-    cost: "5mins",
-  },
-  {
-    key: "2",
-    time: "2017-10-01 14:05",
-    rate: "取货员出发",
-    status: "success",
-    operator: "取货员 ID1234",
-    cost: "1h",
-  },
-  {
-    key: "3",
-    time: "2017-10-01 13:05",
-    rate: "取货员接单",
-    status: "success",
-    operator: "取货员 ID1234",
-    cost: "5mins",
-  },
-  {
-    key: "4",
-    time: "2017-10-01 13:00",
-    rate: "申请审批通过",
-    status: "success",
-    operator: "系统",
-    cost: "1h",
-  },
-  {
-    key: "5",
-    time: "2017-10-01 12:00",
-    rate: "发起退货申请",
-    status: "success",
-    operator: "用户",
-    cost: "5mins",
-  },
-];
-
 export default {
   name: "Profile",
-  components: { PageLayout, DetailListItem, DetailList },
+  components: { PageLayout, DetailListItem, DetailList, CreateForm },
   i18n: require("./i18n"),
   data() {
     this.formLayout = {
@@ -248,10 +111,12 @@ export default {
     return {
       fields: ["userid", "oldPassword", "password", "rePassword"],
       form: this.$form.createForm(this),
-      goodsColumns,
-      goodsData,
-      scheduleColumns,
-      scheduleData,
+      //卡片
+      loading: false,
+      userInfo: {},
+      //修改弹窗
+      visible: false,
+      mdl: null,
     };
   },
   authorize: {
@@ -260,11 +125,145 @@ export default {
   created() {
     this.fields.forEach((v) => this.form.getFieldDecorator(v));
     this.form.setFieldsValue({ userid: this.user.id });
+    this.load();
   },
   computed: {
     ...mapState("account", ["user"]),
   },
   methods: {
+    load() {
+      this.loading = true;
+      request(`${GET_USER_INFO}/${this.user.id}`, METHOD.GET).then((result) => {
+        if (result.data.code != 0) {
+          return;
+        }
+        this.userInfo = result.data.data;
+        this.loading = false;
+      });
+    },
+    edit() {
+      this.visible = true;
+      this.$nextTick(() => {
+        this.mdl = { type: "update", hidePwd: true, data: this.userInfo };
+      });
+    },
+    save() {
+      const form = this.$refs.createModal.form;
+      this.$refs.createModal.loading = true;
+      form.validateFields((errors, values) => {
+        if (!errors) {
+          //设置角色
+          let sourceRoles = this.$refs.createModal.roleSelect;
+          if (!sourceRoles || sourceRoles.length == 0) {
+            this.$message.warning("用户角色不能为空");
+            this.$refs.createModal.loading = false;
+            return;
+          }
+          let userRoles = [];
+          for (let i = 0; i < sourceRoles.length; i++) {
+            userRoles.push(sourceRoles[i].value);
+          }
+          values.userRoles = userRoles;
+          //设置组织机构
+          let sourceOrganizes = this.$refs.createModal.organizeSelect;
+          if (!sourceOrganizes || sourceOrganizes.length == 0) {
+            this.$message.warning("用户组织不能为空");
+            this.$refs.createModal.loading = false;
+            return;
+          }
+          let userOrganizes = [];
+          for (let i = 0; i < sourceOrganizes.length; i++) {
+            userOrganizes.push(sourceOrganizes[i].value);
+          }
+          values.userOrganizes = userOrganizes;
+          //密码加密
+          if (values.password && values.password.length > 0) {
+            values.password = sha256.sha256(values.password);
+          }
+          values.PasswordHashed = true;
+          // 修改 e.g.
+          request(PUT_USER_ITEM, METHOD.PUT, values)
+            .then((result) => {
+              if (result.data.code != 0) {
+                this.$refs.createModal.loading = false;
+                return;
+              }
+              this.load();
+              this.visible = false;
+              this.$refs.createModal.loading = false;
+              // 重置表单数据
+              form.resetFields();
+              this.$message.success("用户修改成功");
+            })
+            .catch(() => {
+              this.$refs.createModal.loading = false;
+            });
+        } else {
+          this.$refs.createModal.loading = false;
+        }
+      });
+    },
+    cancel() {
+      this.visible = false;
+      const form = this.$refs.createModal.form;
+      form.resetFields(); // 清理表单数据（可不做）
+    },
+    getUserAvatar(userInfo) {
+      if (!userInfo || !userInfo.avatar || userInfo.avatar.length == 0) {
+        return this.user.avatar;
+      }
+      return userInfo.avatar;
+    },
+    getUserBirthDay(userInfo) {
+      if (!userInfo || !userInfo.birthDay || userInfo.birthDay.length == 0) {
+        return "";
+      }
+      return moment(userInfo.birthDay, "YYYY-MM-DD HH:mm:ss").format("YYYY-MM-DD");
+    },
+    getUserRoles(userInfo) {
+      if (!userInfo || !userInfo.roles || userInfo.roles.length == 0) {
+        return "";
+      }
+      let names = "";
+      for (let i = 0; i < userInfo.roles.length; i++) {
+        names += i == userInfo.roles.length - 1 ? userInfo.roles[i].name : userInfo.roles[i].name + "，";
+      }
+      return names;
+    },
+    getUserOrganizes(userInfo) {
+      if (!userInfo || !userInfo.organizes || userInfo.organizes.length == 0) {
+        return "";
+      }
+      let names = "";
+      for (let i = 0; i < userInfo.organizes.length; i++) {
+        names += i == userInfo.organizes.length - 1 ? userInfo.organizes[i].name : userInfo.organizes[i].name + "，";
+      }
+      return names;
+    },
+    getUserGander(userInfo) {
+      if (!userInfo || !userInfo.gender || userInfo.gender.length == 0) {
+        return "未知";
+      }
+      switch (userInfo.gender) {
+        default:
+        case 0:
+        case "Unknow": {
+          return "未知";
+        }
+        case 1:
+        case "Male": {
+          return "男";
+        }
+        case 2:
+        case "Female": {
+          return "女";
+        }
+        case 4:
+        case "All": {
+          return "其他";
+        }
+      }
+    },
     handlePwdSubmit() {
       const self = this;
       self.form.validateFields((errors, values) => {

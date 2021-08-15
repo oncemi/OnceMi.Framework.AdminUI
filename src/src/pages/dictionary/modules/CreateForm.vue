@@ -117,7 +117,7 @@ export default {
       }
       //pick 从model中取出表单中对应值
       if (this.model.type === "update") {
-        this.title = "修改数据字典";
+        this.title = "编辑数据字典";
         this.form.setFieldsValue(pick(this.model.data, this.fields));
         this.load();
         if (this.model.data.parentId && this.model.data.parentId > 0) {

@@ -134,7 +134,7 @@ export default {
       },
     };
     return {
-      title: "创建菜单",
+      title: "新建菜单",
       fields: ["id", "parentId", "name", "type", "viewId", "apiId", "sort", "isEnabled", "icon"],
       loading: false,
       form: this.$form.createForm(this),
@@ -172,10 +172,12 @@ export default {
       this.apiSelected = false;
       //pick 从model中取出表单中对应值
       if (this.model.type === "update") {
+        this.title = "编辑菜单";
         this.form.setFieldsValue(pick(this.model.data, this.fields));
         this.onTypeChange(this.model.data.type);
         this.load();
       } else {
+        this.title = "新建菜单";
         this.form.setFieldsValue({ type: 1 });
         this.onTypeChange(1);
         this.load();
