@@ -1,13 +1,9 @@
 import axios from "axios";
-import Cookie from "js-cookie";
-
-// 跨域认证信息 header 名
-const xsrfHeaderName = "Authorization";
+import store from "@/store";
 
 axios.defaults.timeout = 5000;
 axios.defaults.withCredentials = true;
-axios.defaults.xsrfHeaderName = xsrfHeaderName;
-axios.defaults.xsrfCookieName = xsrfHeaderName;
+axios.defaults.xsrfHeaderName = "Authorization";
 
 // 认证类型
 const AUTH_TYPE = {
@@ -54,43 +50,6 @@ async function request(url, method, params, config) {
 }
 
 /**
- * 设置认证信息
- * @param auth {Object}
- * @param authType {AUTH_TYPE} 认证类型，默认：{AUTH_TYPE.BEARER}
- */
-function setAuthorization(user, authType = AUTH_TYPE.BEARER) {
-  switch (authType) {
-    case AUTH_TYPE.BEARER:
-      Cookie.set(xsrfHeaderName, "Bearer " + user.access_token, {
-        expires: new Date(parseInt(user.expires_at) * 1000),
-        sameSite: "none",
-        secure: true,
-      });
-      break;
-    case AUTH_TYPE.BASIC:
-    default:
-      break;
-  }
-  localStorage.setItem(process.env.VUE_APP_TOKEN_KEY, user);
-}
-
-/**
- * 移出认证信息
- * @param authType {AUTH_TYPE} 认证类型
- */
-function removeAuthorization(authType = AUTH_TYPE.BEARER) {
-  switch (authType) {
-    case AUTH_TYPE.BEARER:
-      Cookie.remove(xsrfHeaderName);
-      break;
-    case AUTH_TYPE.BASIC:
-    default:
-      break;
-  }
-  localStorage.removeItem(process.env.VUE_APP_TOKEN_KEY);
-}
-
-/**
  * 检查认证信息
  * @param authType
  * @returns {boolean}
@@ -98,8 +57,12 @@ function removeAuthorization(authType = AUTH_TYPE.BEARER) {
 function checkAuthorization(authType = AUTH_TYPE.BEARER) {
   switch (authType) {
     case AUTH_TYPE.BEARER:
-      if (Cookie.get(xsrfHeaderName)) {
-        return true;
+      {
+        let token = store.getters["account/token"];
+        let timeNow = Math.round(new Date().getTime() / 1000);
+        if (token && token.expires_at - 60 >= timeNow) {
+          return true;
+        }
       }
       break;
     case AUTH_TYPE.BASIC:
@@ -168,13 +131,4 @@ function parseUrlParams(url) {
   return params;
 }
 
-export {
-  METHOD,
-  AUTH_TYPE,
-  request,
-  setAuthorization,
-  removeAuthorization,
-  checkAuthorization,
-  loadInterceptors,
-  parseUrlParams,
-};
+export { METHOD, AUTH_TYPE, request, checkAuthorization, loadInterceptors, parseUrlParams };

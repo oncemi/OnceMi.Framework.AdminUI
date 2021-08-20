@@ -1,8 +1,9 @@
 import { hasAuthority } from "@/utils/authority-utils";
 import { loginIgnore } from "@/router/index";
 import { checkAuthorization } from "@/utils/request";
-import { refreshToken } from "@/services/auth";
+import { refreshToken, localRefreshToken } from "@/services/auth";
 import NProgress from "nprogress";
+import store from "@/store";
 
 NProgress.configure({ showSpinner: false });
 
@@ -27,26 +28,38 @@ const progressStart = (to, from, next) => {
  * @param next
  * @param options
  */
-/**
- * 登录守卫
- * @param to
- * @param form
- * @param next
- * @param options
- */
 const loginGuard = (to, from, next, options) => {
   const { message } = options;
+
   if (!loginIgnore.includes(to) && !checkAuthorization) {
-    refreshToken()
-      .then(function() {
-        next();
-      })
-      .catch(function(err) {
-        console.log("RefreshToken failed, " + JSON.stringify(err));
-        console.error(err);
-        message.warning("登录已失效，请重新登录");
-        next({ path: "/login" });
-      });
+    if (store.state.setting.isEnabledIdentityServer) {
+      refreshToken()
+        .then(function() {
+          next();
+        })
+        .catch(function(err) {
+          console.log("RefreshToken failed, " + JSON.stringify(err));
+          console.error(err);
+          message.warning("登录已失效，请重新登录");
+          next({ path: "/login" });
+        });
+    } else {
+      localRefreshToken()
+        .then((result) => {
+          if (result && result.data.code == 0) {
+            next();
+          }
+          console.log("RefreshToken failed, " + JSON.stringify(result));
+          message.warning("登录已失效，请重新登录");
+          next({ path: "/login" });
+        })
+        .catch(function(err) {
+          console.log("RefreshToken failed, " + JSON.stringify(err));
+          console.error(err);
+          message.warning("登录已失效，请重新登录");
+          next({ path: "/login" });
+        });
+    }
   } else {
     next();
   }

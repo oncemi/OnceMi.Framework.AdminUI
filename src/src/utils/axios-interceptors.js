@@ -1,4 +1,4 @@
-import Cookie from "js-cookie";
+import { localRefreshToken } from "../services/auth";
 
 const resperr = {
   /**
@@ -49,7 +49,7 @@ const resperr = {
         message.error("请求失败，请先登录");
         break;
       case 403:
-        message.error("请求失败，权限不足");
+        message.error("请求失败，没有执行此操作的权限");
         break;
       case 404:
         message.error("请求失败（404 Not Found），请检查接口配置是否正确或联系管理员");
@@ -84,21 +84,49 @@ const reqCommon = {
    * @param options 应用配置 包含: {router, i18n, store, message}
    * @returns {*}
    */
-  onFulfilled(config, options) {
-    const { message } = options;
-    const { url, xsrfCookieName } = config;
-    if (
-      typeof url != "undefined" &&
-      url.toLowerCase().indexOf("login") === -1 &&
-      url.toLowerCase().indexOf("callback") === -1 &&
-      url.toLowerCase().indexOf("refesh") === -1 &&
-      xsrfCookieName &&
-      !Cookie.get(xsrfCookieName)
-    ) {
-      message.warning("认证已过期，请重新登录");
+  async onFulfilled(config, options) {
+    const { message, store } = options;
+    const { url } = config;
+    let requestUrlInIgnoreList = function(url) {
+      if (!url) {
+        return false;
+      }
+      const ignoreApiArgs = ["login", "callback", "refesh", "revoketoken"];
+      url = url.toLowerCase();
+      for (let i = 0; i < ignoreApiArgs.length; i++) {
+        if (url.indexOf(ignoreApiArgs[i]) >= 0) {
+          return true;
+        }
+      }
+      return false;
+    };
+
+    let token = store.getters["account/token"];
+    let isExpires = (token ? token.expires_at : 0) - 60 < Math.round(new Date().getTime() / 1000);
+
+    if (!requestUrlInIgnoreList(url) && (!token || isExpires)) {
+      if (token && isExpires) {
+        console.log("[Local]AccessToken expiring, start refresh token...");
+        let newToken = await localRefreshToken();
+        if (newToken) {
+          console.log("[Local]Refresh successful, token is " + JSON.stringify(newToken));
+          config.headers.Authorization = `Bearer ${newToken.access_token}`;
+        } else {
+          message.warning("认证已过期，请重新登录");
+          window.location.replace("/");
+        }
+      } else {
+        message.warning("认证已过期，请重新登录");
+        window.location.replace("/");
+      }
+    } else {
+      if (!requestUrlInIgnoreList(url)) {
+        config.headers.Authorization = `Bearer ${token.access_token}`;
+      }
     }
     return config;
   },
+
   /**
    * 请求出错时做点什么
    * @param error 错误对象

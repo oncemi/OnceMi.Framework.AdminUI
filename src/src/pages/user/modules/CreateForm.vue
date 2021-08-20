@@ -108,50 +108,12 @@
             </a-form-item>
           </a-col>
         </a-row>
-        <a-row>
+        <a-row v-show="noHidePasswordInput">
           <a-col :span="12" class="input-col">
             <a-form-item label="用户密码">
               <a-input
                 v-decorator="['password', { rules: [{ required: false, min: 6, message: '用户密码至少6个字符！' }] }]"
                 placeholder="修改时为空则不修改"
-              />
-            </a-form-item>
-          </a-col>
-        </a-row>
-        <a-row>
-          <a-col :span="12" class="input-col">
-            <a-form-item label="组织">
-              <a-tree-select
-                v-model="organizeSelect"
-                placeholder="请选择用户组织"
-                :tree-data="organizeTreeData"
-                :treeCheckable="true"
-                :allowClear="true"
-                :dropdownMatchSelectWidth="true"
-                :getPopupContainer="getPopupContainer"
-                :showCheckedStrategy="SHOW_ALL"
-                :treeDefaultExpandAll="true"
-                :treeCheckStrictly="true"
-                :replaceFields="{ children: 'children', title: 'name', value: 'id' }"
-                @change="onOrganizeSelected"
-              />
-            </a-form-item>
-          </a-col>
-          <a-col :span="12" class="input-col">
-            <a-form-item label="角色">
-              <a-tree-select
-                v-model="roleSelect"
-                placeholder="请选择用户角色"
-                :tree-data="roleTreeData"
-                :treeCheckable="true"
-                :allowClear="true"
-                :dropdownMatchSelectWidth="true"
-                :getPopupContainer="getPopupContainer"
-                :showCheckedStrategy="SHOW_ALL"
-                :treeDefaultExpandAll="true"
-                :treeCheckStrictly="true"
-                :replaceFields="{ children: 'children', title: 'name', value: 'id' }"
-                @change="onRoleSelected"
               />
             </a-form-item>
           </a-col>
@@ -195,6 +157,44 @@
             </a-form-item>
           </a-col>
         </a-row>
+        <a-row>
+          <a-col :span="12" class="input-col">
+            <a-form-item label="组织">
+              <a-tree-select
+                v-model="organizeSelect"
+                placeholder="请选择用户组织"
+                :tree-data="organizeTreeData"
+                :treeCheckable="true"
+                :allowClear="true"
+                :dropdownMatchSelectWidth="true"
+                :getPopupContainer="getPopupContainer"
+                :showCheckedStrategy="SHOW_ALL"
+                :treeDefaultExpandAll="true"
+                :treeCheckStrictly="true"
+                :replaceFields="{ children: 'children', title: 'name', value: 'id' }"
+                @change="onOrganizeSelected"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col :span="12" class="input-col">
+            <a-form-item label="角色">
+              <a-tree-select
+                v-model="roleSelect"
+                placeholder="请选择用户角色"
+                :tree-data="roleTreeData"
+                :treeCheckable="true"
+                :allowClear="true"
+                :dropdownMatchSelectWidth="true"
+                :getPopupContainer="getPopupContainer"
+                :showCheckedStrategy="SHOW_ALL"
+                :treeDefaultExpandAll="true"
+                :treeCheckStrictly="true"
+                :replaceFields="{ children: 'children', title: 'name', value: 'id' }"
+                @change="onRoleSelected"
+              />
+            </a-form-item>
+          </a-col>
+        </a-row>
       </a-form>
     </a-spin>
   </a-modal>
@@ -202,6 +202,7 @@
 
 <script>
 import pick from "lodash.pick";
+import moment from "moment";
 import { GET_ORGANIZE_CASCADER, GET_ROLE_CASCADER, GET_USER_STATUS, GET_USER_GENDER } from "@/services/api";
 import { request, METHOD } from "@/utils/request";
 import imgUpload from "vue-image-crop-upload/upload-2.vue";
@@ -259,6 +260,7 @@ export default {
       statusSelectList: [],
       //识别下拉框
       genderSelectList: [],
+      noHidePasswordInput: true,
     };
   },
   created() {
@@ -272,9 +274,18 @@ export default {
       }
       //pick 从model中取出表单中对应值
       if (this.model.type === "update" || this.model.type === "view") {
+        this.title = "编辑用户";
+        //编辑用户时，是否隐藏修改密码
+        if (this.model.hidePwd && this.model.hidePwd === true) {
+          this.noHidePasswordInput = false;
+        }
+        if (this.model.data.birthDay && this.model.data.birthDay.length > 0) {
+          this.model.data.birthDay = moment(this.model.data.birthDay, "YYYY-MM-DD HH:mm:ss");
+        }
         this.form.setFieldsValue(pick(this.model.data, this.fields));
         this.load();
       } else {
+        this.title = "创建用户";
         this.load();
       }
     });

@@ -152,7 +152,7 @@ export default {
       },
     };
     return {
-      title: "创建定时任务",
+      title: "新建定时任务",
       fields: [
         "id",
         "name",
@@ -188,6 +188,7 @@ export default {
       }
       //pick 从model中取出表单中对应值
       if (this.model.type === "update") {
+        this.title = "编辑定时任务";
         //将string datetime转换为moment
         if (this.model.data.startTime && this.model.data.startTime.length > 0)
           this.model.data.startTime = moment(this.model.data.startTime, "YYYY-MM-DD HH:mm:ss");
@@ -197,6 +198,7 @@ export default {
         this.form.setFieldsValue(pick(this.model.data, this.fields));
         this.load();
       } else {
+        this.title = "新建定时任务";
         //设置请求方式默认值，requestMethod
         this.form.setFieldsValue({ requestMethod: "Get" });
         //设置发送通知默认值，noticePolicy

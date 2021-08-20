@@ -1,5 +1,7 @@
 import { UserManager, WebStorageStateStore } from "oidc-client";
-import { setAuthorization, removeAuthorization } from "@/utils/request";
+import { POST_LOGOUT, POST_REFESH } from "@/services/api";
+import { request, METHOD } from "@/utils/request";
+import store from "@/store";
 
 const CLIENT_ID = process.env.VUE_APP_CLIENT_ID;
 
@@ -27,12 +29,12 @@ userManager.events.addUserSignedOut(async () => {
 userManager.events.addAccessTokenExpiring(function() {
   console.log("AccessToken expiring, start refresh token...");
   refreshToken().catch(function(err) {
-    console.log("RefreshToken failed, " + JSON.stringify(err));
+    console.log("[IdentityServer]RefreshToken failed, " + JSON.stringify(err));
     console.error(err);
   });
 });
 
-class Account {
+class ids4Account {
   async login() {
     await userManager.signinRedirect();
   }
@@ -41,8 +43,11 @@ class Account {
     localStorage.removeItem(process.env.VUE_APP_ROUTES_KEY);
     localStorage.removeItem(process.env.VUE_APP_PERMISSIONS_KEY);
     localStorage.removeItem(process.env.VUE_APP_ROLES_KEY);
-    removeAuthorization();
+
     await userManager.signoutRedirect();
+    //set token null
+    store.commit("account/setToken", null);
+    //store.commit("account/setUser", null);
   }
 
   // Renew the token manually
@@ -55,7 +60,7 @@ class Account {
           if (user == null) {
             self.login();
           } else {
-            setAuthorization(user);
+            store.commit("account/setToken", user);
             return resolve(user);
           }
         })
@@ -211,14 +216,77 @@ class Account {
     });
   }
 }
+class localAccount {
+  refreshTokenPromise = null;
 
-const account = new Account();
+  refreshToken = async () => {
+    if (this.refreshTokenPromise) {
+      return this.refreshTokenPromise.then(() => {
+        let lastRefeshToken = store.getters["account/token"];
+        return lastRefeshToken;
+      });
+    }
+    let newToken = undefined;
+    let oldToken = store.getters["account/token"];
+    if (!oldToken || !oldToken.refresh_token) {
+      return newToken;
+    }
+    this.refreshTokenPromise = request(POST_REFESH, METHOD.POST, {
+      Token: oldToken.refresh_token,
+    })
+      .then((result) => {
+        if (result && result.data.code == 0) {
+          let userToken = {
+            access_token: result.data.data.accessToken,
+            refresh_token: result.data.data.refreshToken,
+            token_type: result.data.data.tokenType,
+            expires_at: result.data.data.expiresAt,
+            profile: result.data.data.profile,
+            isRemember: oldToken.isRemember,
+          };
+          newToken = userToken;
+          //设置用户
+          if (newToken) {
+            store.commit("account/setToken", newToken);
+          }
+          this.refreshTokenPromise = null;
+          return newToken;
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+    return this.refreshTokenPromise;
+  };
 
-export const login = async () => account.login();
-export const logout = async () => account.logout();
-export const refreshToken = () => account.refreshToken();
-export const getUser = () => account.getUser();
-export const getRole = () => account.getRole();
-export const getProfile = () => account.getProfile();
+  logout = async () => {
+    localStorage.removeItem(process.env.VUE_APP_ROUTES_KEY);
+    localStorage.removeItem(process.env.VUE_APP_PERMISSIONS_KEY);
+    localStorage.removeItem(process.env.VUE_APP_ROLES_KEY);
 
-export default account;
+    let token = store.getters["account/token"];
+    //clean
+    store.commit("account/setToken", null);
+    //store.commit("account/setUser", null);
+
+    if (token && token.refresh_token) {
+      await request(POST_LOGOUT, METHOD.POST, {
+        Token: token.refresh_token,
+      });
+    }
+  };
+}
+
+const ids4At = new ids4Account();
+
+export const login = async () => ids4At.login();
+export const logout = async () => ids4At.logout();
+export const refreshToken = () => ids4At.refreshToken();
+export const getUser = () => ids4At.getUser();
+export const getRole = () => ids4At.getRole();
+export const getProfile = () => ids4At.getProfile();
+
+const localAt = new localAccount();
+
+export const localRefreshToken = async () => localAt.refreshToken();
+export const localLogout = async () => localAt.logout();

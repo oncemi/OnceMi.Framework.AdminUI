@@ -23,17 +23,22 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
-import { logout } from "@/services/auth";
+import { mapGetters, mapState } from "vuex";
+import { logout, localLogout } from "@/services/auth";
 
 export default {
   name: "HeaderAvatar",
   computed: {
     ...mapGetters("account", ["user"]),
+    ...mapState("setting", ["isEnabledIdentityServer"]),
   },
   methods: {
-    logout() {
-      logout();
+    async logout() {
+      if (this.isEnabledIdentityServer) {
+        logout();
+      } else {
+        await localLogout();
+      }
       this.$router.push("/login");
     },
     goToProfile() {

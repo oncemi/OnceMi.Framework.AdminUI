@@ -3,7 +3,7 @@
 </template>
 <script>
 import { userManager } from "@/services/auth";
-import { setAuthorization } from "@/utils/request";
+import { mapMutations } from "vuex";
 
 export default {
   name: "RefreshToken",
@@ -12,18 +12,21 @@ export default {
   },
   async created() {
     userManager.signinSilentCallback().then(
-      function(user) {
-        if (user == null) {
+      function(userToken) {
+        if (userToken == null) {
           console.log("Signin silent callback error: ", "result user is null");
           return;
         }
-        setAuthorization(user);
+        this.setToken(userToken);
       },
       (err) => {
         console.log("Error caught in signinSilentCallback().");
         console.error(err);
       }
     );
+  },
+  methods: {
+    ...mapMutations("account", ["setToken"]),
   },
 };
 </script>
