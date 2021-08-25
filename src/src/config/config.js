@@ -12,5 +12,5 @@ module.exports = {
   configureWebpack: {
     devtool: "source-map",
   },
-  isEnabledIdentityServer: false,
+  isEnabledIdentityServer: true,
 };

@@ -14,7 +14,7 @@
         <span>设置</span>
       </a-menu-item>
       <a-menu-divider />
-      <a-menu-item @click="logout">
+      <a-menu-item @click="goToLogout">
         <a-icon style="margin-right: 8px;" type="poweroff" />
         <span>退出登录</span>
       </a-menu-item>
@@ -24,22 +24,15 @@
 
 <script>
 import { mapGetters, mapState } from "vuex";
-import { logout, localLogout } from "@/services/auth";
 
 export default {
   name: "HeaderAvatar",
   computed: {
     ...mapGetters("account", ["user"]),
-    ...mapState("setting", ["isEnabledIdentityServer"]),
   },
   methods: {
-    async logout() {
-      if (this.isEnabledIdentityServer) {
-        logout();
-      } else {
-        await localLogout();
-      }
-      this.$router.push("/login");
+    goToLogout() {
+      this.$router.push("/logout");
     },
     goToProfile() {
       this.$router.replace("/personal/profile");

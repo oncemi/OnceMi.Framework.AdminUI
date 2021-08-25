@@ -58,7 +58,7 @@
 import pick from "lodash.pick";
 import { GET_FILE_ACCESSMODE_SELECTLIST, POST_FILE_ITEM, DELETE_FILE_ITEM } from "@/services/api";
 import { request, METHOD } from "@/utils/request";
-import { getUser } from "@/services/auth";
+import { mapState } from "vuex";
 
 export default {
   props: {
@@ -95,6 +95,9 @@ export default {
       fileList: [],
     };
   },
+  computed: {
+    ...mapState("account", ["token"]),
+  },
   created() {
     // 防止表单未注册
     this.fields.forEach((v) => this.form.getFieldDecorator(v));
@@ -104,6 +107,9 @@ export default {
         this.$message.warning("加载表单数据失败");
         return;
       }
+      //设置accessToken
+      this.accessToken = this.token.access_token;
+
       if (this.model.type === "update") {
         this.form.setFieldsValue(pick(this.model.data, this.fields));
         this.load();
@@ -111,10 +117,6 @@ export default {
         this.load();
       }
     });
-  },
-  async mounted() {
-    let userInfo = await getUser();
-    this.accessToken = userInfo.access_token;
   },
   methods: {
     load() {

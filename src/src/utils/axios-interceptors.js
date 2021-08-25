@@ -1,4 +1,4 @@
-import { localRefreshToken } from "../services/auth";
+import { refreshToken, localRefreshToken } from "../services/auth";
 
 const resperr = {
   /**
@@ -85,8 +85,6 @@ const reqCommon = {
    * @returns {*}
    */
   async onFulfilled(config, options) {
-    const { message, store } = options;
-    const { url } = config;
     let requestUrlInIgnoreList = function(url) {
       if (!url) {
         return false;
@@ -100,24 +98,42 @@ const reqCommon = {
       }
       return false;
     };
+    let requestFailed = function() {
+      message.warning("认证已过期，请重新登录");
+      window.location.replace("/");
+      return Promise.reject();
+    };
 
-    let token = store.getters["account/token"];
-    let isExpires = (token ? token.expires_at : 0) - 60 < Math.round(new Date().getTime() / 1000);
+    const { message, store } = options;
+    const { url } = config;
+    const token = store.getters["account/token"];
+    const isExpires = (token ? token.expires_at : 0) - 60 < Math.round(new Date().getTime() / 1000);
 
     if (!requestUrlInIgnoreList(url) && (!token || isExpires)) {
       if (token && isExpires) {
-        console.log("[Local]AccessToken expiring, start refresh token...");
-        let newToken = await localRefreshToken();
-        if (newToken) {
-          console.log("[Local]Refresh successful, token is " + JSON.stringify(newToken));
-          config.headers.Authorization = `Bearer ${newToken.access_token}`;
+        if (store.state.setting.isEnabledIdentityServer) {
+          //IdentityServer token refesh
+          console.log("[IdentityServer]AccessToken expiring, start refresh token...");
+          let newToken = await refreshToken();
+          if (newToken) {
+            console.log("[IdentityServer]Refresh successful, token is " + JSON.stringify(newToken));
+            config.headers.Authorization = `Bearer ${newToken.access_token}`;
+          } else {
+            return requestFailed();
+          }
         } else {
-          message.warning("认证已过期，请重新登录");
-          window.location.replace("/");
+          //本地刷新
+          console.log("[Local]AccessToken expiring, start refresh token...");
+          let newToken = await localRefreshToken();
+          if (newToken) {
+            console.log("[Local]Refresh successful, token is " + JSON.stringify(newToken));
+            config.headers.Authorization = `Bearer ${newToken.access_token}`;
+          } else {
+            return requestFailed();
+          }
         }
       } else {
-        message.warning("认证已过期，请重新登录");
-        window.location.replace("/");
+        return requestFailed();
       }
     } else {
       if (!requestUrlInIgnoreList(url)) {

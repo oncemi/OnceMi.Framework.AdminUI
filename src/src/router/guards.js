@@ -46,12 +46,7 @@ const loginGuard = (to, from, next, options) => {
     } else {
       localRefreshToken()
         .then((result) => {
-          if (result && result.data.code == 0) {
-            next();
-          }
-          console.log("RefreshToken failed, " + JSON.stringify(result));
-          message.warning("登录已失效，请重新登录");
-          next({ path: "/login" });
+          next();
         })
         .catch(function(err) {
           console.log("RefreshToken failed, " + JSON.stringify(err));

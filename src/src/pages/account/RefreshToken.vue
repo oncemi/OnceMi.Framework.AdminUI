@@ -2,7 +2,7 @@
   <div></div>
 </template>
 <script>
-import { userManager } from "@/services/auth";
+import { userManager, getUser } from "@/services/auth";
 import { mapMutations } from "vuex";
 
 export default {
@@ -12,11 +12,19 @@ export default {
   },
   async created() {
     userManager.signinSilentCallback().then(
-      function(userToken) {
-        if (userToken == null) {
-          console.log("Signin silent callback error: ", "result user is null");
+      (userToken) => {
+        if (!userToken) {
+          getUser().then((result) => {
+            if (!result) {
+              console.log("Signin silent callback error: ", "result user is null");
+              return;
+            }
+            console.log("Refesh token result:", JSON.stringify(result));
+            this.setToken(result);
+          });
           return;
         }
+        console.log("Refesh token result:", JSON.stringify(userToken));
         this.setToken(userToken);
       },
       (err) => {

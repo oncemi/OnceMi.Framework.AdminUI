@@ -4,7 +4,6 @@
 <script>
 import { mapState } from "vuex";
 import { logout, localLogout } from "@/services/auth";
-import { checkAuthorization } from "@/utils/request";
 export default {
   name: "Logout",
   data() {
@@ -14,14 +13,12 @@ export default {
     ...mapState("setting", ["isEnabledIdentityServer"]),
   },
   mounted: async function() {
-    if (!checkAuthorization()) {
-      this.$router.push("/login");
+    if (this.isEnabledIdentityServer) {
+      await logout().then((result) => {
+        this.$router.push("/login");
+      });
     } else {
-      if (this.isEnabledIdentityServer) {
-        logout();
-      } else {
-        await localLogout();
-      }
+      localLogout();
       this.$router.push("/login");
     }
   },

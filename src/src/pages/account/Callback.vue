@@ -2,7 +2,7 @@
   <div></div>
 </template>
 <script>
-import { userManager } from "@/services/auth";
+import { userManager, getUser } from "@/services/auth";
 import { getUserRoutes, getUserInfo, getUserRoles } from "@/services/user";
 import { loadRoutes } from "@/utils/routerUtil";
 import { mapMutations } from "vuex";
@@ -16,9 +16,8 @@ export default {
     };
   },
   async created() {
-    let self = this;
     userManager.signinRedirectCallback().then(
-      function(userToken) {
+      async (userToken) => {
         window.history.replaceState({}, window.document.title, window.location.origin + window.location.pathname);
         if (!userToken) {
           this.$router.push("/500");
@@ -32,7 +31,7 @@ export default {
         getUserInfo().then((result) => {
           this.setUser(result);
         });
-        self.afterLogin();
+        this.afterLogin();
       },
       (err) => {
         console.log("Error caught in signinRedirectCallback().");

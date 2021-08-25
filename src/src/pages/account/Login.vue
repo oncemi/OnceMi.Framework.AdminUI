@@ -127,7 +127,7 @@ export default {
         //本地认证登录
         this.loadPage = true;
         //是否记住密码
-        if (this.token && this.token.isRemember) {
+        if (this.token && this.token.refresh_token && this.token.isRemember) {
           let newToken = await localRefreshToken();
           if (newToken) {
             this.loadRoutes();
@@ -231,15 +231,16 @@ export default {
       }
     },
     loadRoutes() {
+      let self = this;
       getUserRoutes()
         .then((result) => {
           loadRoutes(result.data.data);
-          const redirect = this.$route.query?.redirect ? this.$route.query.redirect : "/dashboard/analysis";
-          this.$router.push(redirect);
+          const redirect = self.$route.query?.redirect ? self.$route.query.redirect : "/dashboard/analysis";
+          self.$router.push(redirect);
         })
         .catch(function(error) {
           console.error(error);
-          this.$router.push("/403");
+          self.$router.push("/403");
         });
     },
   },
