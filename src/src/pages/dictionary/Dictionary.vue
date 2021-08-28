@@ -152,11 +152,6 @@ export default {
       mdl: null,
     };
   },
-  computed: {
-    desc() {
-      return this.$t("description");
-    },
-  },
   created() {
     this.reload();
     this.form = this.$form.createForm(this);

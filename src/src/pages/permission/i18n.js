@@ -6,7 +6,6 @@ module.exports = {
       refeshPermissions: "刷新",
       refeshRole: "刷新",
       save: "保存",
-      description: "管理角色授权，控制角色访问菜单和接口的权限。",
     },
     HK: {
       roleList: "角色",
@@ -14,7 +13,6 @@ module.exports = {
       refeshPermissions: "刷新",
       refeshRole: "刷新",
       save: "保存",
-      description: "管理角色授权，控制角色访问菜单和接口的权限。",
     },
     US: {
       roleList: "Roles",
@@ -22,7 +20,6 @@ module.exports = {
       refeshPermissions: "Refesh",
       refeshRole: "Refesh",
       save: "Save",
-      description: "Manage role authorization and control the permissions of role access menus and interfaces.",
     },
   },
 };

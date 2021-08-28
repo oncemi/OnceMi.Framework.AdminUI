@@ -118,11 +118,6 @@ export default {
       disabled: true,
     };
   },
-  computed: {
-    desc() {
-      return this.$t("description");
-    },
-  },
   created() {
     this.reload();
   },

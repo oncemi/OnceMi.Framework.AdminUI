@@ -175,11 +175,6 @@ export default {
   authorize: {
     deleteRecord: "delete",
   },
-  computed: {
-    desc() {
-      return this.$t("description");
-    },
-  },
   created() {
     this.load();
     this.loadSelectTypes();

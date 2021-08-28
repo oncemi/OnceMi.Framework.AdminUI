@@ -81,6 +81,10 @@ const routerMap = {
     name: "个人信息",
     component: () => import("@/pages/profile/Profile"),
   },
+  systeminfo: {
+    name: "系统信息",
+    component: () => import("@/pages/systeminfo/SystemInfo"),
+  },
   exception: {
     name: "异常页",
     icon: "warning",

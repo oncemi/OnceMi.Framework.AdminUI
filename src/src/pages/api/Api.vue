@@ -184,11 +184,6 @@ export default {
   authorize: {
     deleteRecord: "delete",
   },
-  computed: {
-    desc() {
-      return this.$t("description");
-    },
-  },
   created() {
     this.loadApiVersions();
     this.load();

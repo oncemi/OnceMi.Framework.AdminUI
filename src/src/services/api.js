@@ -95,4 +95,6 @@ module.exports = {
   POST_FILE_ITEM: `${BASE_URL}/api/v1/File`,
   DELETE_FILE_ITEM: `${BASE_URL}/api/v1/File`,
   GET_FILE_ACCESSMODE_SELECTLIST: `${BASE_URL}/api/v1/File/AccessModeSelectList`,
+  //Config
+  GET_SYSTEM_HARDWARE_INFO: `${BASE_URL}/api/v1/Config/SystemHardwareInfo`,
 };

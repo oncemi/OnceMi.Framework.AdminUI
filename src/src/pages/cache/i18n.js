@@ -8,7 +8,6 @@ module.exports = {
     },
     US: {
       content: "View Management",
-      description: "Only after the view is created, the page can be previewed.",
     },
   },
 };

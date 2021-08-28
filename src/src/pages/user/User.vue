@@ -290,11 +290,6 @@ export default {
       roleListData: [],
     };
   },
-  computed: {
-    desc() {
-      return this.$t("description");
-    },
-  },
   created() {
     this.loadRoleSelectData();
     this.reload();

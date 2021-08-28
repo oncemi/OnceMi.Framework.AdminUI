@@ -21,7 +21,7 @@ module.exports = {
   systemName: "OnceMi", //系统名称
   copyright: "Powered by OnceMi", //copyright
   asyncRoutes: false, //异步加载路由，true:开启，false:不开启
-  showPageTitle: true, //是否显示页面标题（PageLayout 布局中的页面标题），true:显示，false:不显示
+  showPageTitle: false, //是否显示页面标题（PageLayout 布局中的页面标题），true:显示，false:不显示
   filterMenu: true, //根据权限过滤菜单，true:过滤，false:不过滤
   animate: {
     //动画设置
