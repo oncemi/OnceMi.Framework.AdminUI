@@ -2,20 +2,26 @@
   <page-layout title="系统信息">
     <a-card :bordered="true" :loading="loading">
       <detail-list title="基本信息">
-        <detail-list-item term="操作系统">{{ hardwareInfo.osName }}</detail-list-item>
-        <detail-list-item term="操作系统位数">{{ hardwareInfo.osBit }}</detail-list-item>
-        <detail-list-item term="应用程序位数">{{ hardwareInfo.processBit }}</detail-list-item>
+        <detail-list-item term="操作系统">{{ hardwareInfo.osDescription }}</detail-list-item>
+        <detail-list-item term="操作系统架构">{{ hardwareInfo.osArchitecture }}</detail-list-item>
+        <detail-list-item term="应用程序架构">{{ hardwareInfo.processArchitecture }}</detail-list-item>
         <detail-list-item term="内存总数">{{ hardwareInfo.totalPhysicalMemory }} MB</detail-list-item>
         <detail-list-item term="空闲内存">{{ hardwareInfo.availablePhysicalMemory }} MB</detail-list-item>
         <detail-list-item term="应用程序占用">{{ hardwareInfo.processUsedMemory }} MB</detail-list-item>
         <detail-list-item term="CPU型号">{{ cpuinfo.name }}</detail-list-item>
         <detail-list-item term="CPU时钟频率">{{ cpuinfo.maxClockSpeed }} GHz</detail-list-item>
         <detail-list-item term="CPU核心数">{{ cpuinfo.numberOfCores }}</detail-list-item>
+        <detail-list-item term="开机时间"
+          >{{ parseInt(hardwareInfo.osTickMins / 60 / 24) }}天{{ parseInt((hardwareInfo.osTickMins / 60) % 24) }}小时{{
+            parseInt(hardwareInfo.osTickMins % 60)
+          }}分钟</detail-list-item
+        >
         <detail-list-item term="应用程序目录">{{ hardwareInfo.processPath }}</detail-list-item>
       </detail-list>
       <a-divider style="margin-bottom: 32px" />
       <detail-list title="授权信息">
-        <detail-list-item term="授权给">成都猿米科技有限公司</detail-list-item>
+        <detail-list-item term="授权给">基于开源软件协议（MIT）内的任何人</detail-list-item>
+        <detail-list-item term="授权到期时间">永久</detail-list-item>
       </detail-list>
       <!-- <a-divider style="margin-bottom: 32px" /> -->
     </a-card>

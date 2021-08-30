@@ -83,7 +83,7 @@
                 <a-input v-decorator="['code', { rules: [{ required: false }] }]" placeholder="可选，字典编码" />
               </a-form-item>
               <a-form-item label="字典值">
-                <a-input v-decorator="['value', { rules: [{ required: false }] }]" placeholder="可选，字典名称" />
+                <a-input v-decorator="['value', { rules: [{ required: false }] }]" placeholder="可选，字典值" />
               </a-form-item>
               <a-form-item label="排序">
                 <a-input-number
@@ -94,7 +94,11 @@
                 />
               </a-form-item>
               <a-form-item label="描述/备注">
-                <a-input v-decorator="['description', { rules: [{ required: false }] }]" placeholder="可选，字典名称" />
+                <a-textarea
+                  v-decorator="['description', { rules: [{ required: false }] }]"
+                  placeholder="可选，字典描述或备注"
+                  :auto-size="{ minRows: 3, maxRows: 6 }"
+                />
               </a-form-item>
               <a-form-item label="状态">
                 <a-switch v-decorator="['isEnabled', { valuePropName: 'checked', initialValue: true }]" />
