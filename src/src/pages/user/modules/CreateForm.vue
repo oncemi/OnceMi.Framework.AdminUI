@@ -157,7 +157,7 @@
             </a-form-item>
           </a-col>
         </a-row>
-        <a-row>
+        <a-row v-show="noHidePasswordInput">
           <a-col :span="12" class="input-col">
             <a-form-item label="组织">
               <a-tree-select
