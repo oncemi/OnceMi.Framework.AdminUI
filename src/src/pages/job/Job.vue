@@ -21,9 +21,9 @@
               </a-col>
             </a-row>
           </div>
-          <span style="float: right;">
+          <span class="search-left">
             <a-button type="primary" icon="search" @click="load(false)">查询</a-button>
-            <a-button style="margin-left: 8px" @click="reset">重置</a-button>
+            <a-button icon="sync" style="margin-left: 8px" @click="reset">刷新</a-button>
             <a @click="toggleAdvanced" style="margin-left: 8px">
               {{ advanced ? "收起" : "展开" }}
               <a-icon :type="advanced ? 'up' : 'down'" />

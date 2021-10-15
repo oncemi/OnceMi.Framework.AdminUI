@@ -20,20 +20,22 @@
             </a-col>
           </a-row>
         </div>
-        <span style="float: right;">
-          <a-button type="primary" @click="load">查询</a-button>
-          <a-button style="margin-left: 8px" @click="reset">重置</a-button>
-          <a @click="toggleAdvanced" style="margin-left: 8px">
-            {{ advanced ? "收起" : "展开" }}
-            <a-icon :type="advanced ? 'up' : 'down'" />
-          </a>
+        <span class="search-left">
+          <a-space>
+            <a-button type="primary" icon="search" @click="load">查询</a-button>
+            <a-button icon="close-circle" @click="reset">重置</a-button>
+            <a @click="toggleAdvanced">
+              {{ advanced ? "收起" : "展开" }}
+              <a-icon :type="advanced ? 'up' : 'down'" />
+            </a>
+          </a-space>
         </span>
       </a-form>
     </div>
     <div>
       <a-space class="operator">
-        <a-button @click="add" type="primary">上传</a-button>
-        <a-button @click="deleteSelectItems" type="danger">删除</a-button>
+        <a-button @click="add" type="primary" icon="upload">上传</a-button>
+        <a-button @click="deleteSelectItems" type="danger" icon="delete">删除</a-button>
       </a-space>
       <div>
         <a-table
@@ -80,6 +82,7 @@ import { GET_FILE_LIST, DELETE_FILE_ITEM } from "@/services/api";
 import { request, METHOD } from "@/utils/request";
 import { mapState } from "vuex";
 import CreateForm from "./modules/CreateForm";
+import axios from "axios";
 
 export default {
   name: "FilesManagement",
@@ -184,7 +187,7 @@ export default {
     this.load();
   },
   computed: {
-    ...mapState("account", ["user"]),
+    ...mapState("account", ["user", "token"]),
   },
   methods: {
     load() {
@@ -235,7 +238,14 @@ export default {
         this.$message.warning("下载失败，无法获取文件URL");
         return;
       }
-      window.open(record.url);
+
+      let token = this.token.access_token;
+      if (!token) {
+        this.$message.warning("获取当前登录用户信息失败");
+        return;
+      }
+      let url = record.url + "&token=" + encodeURIComponent(token);
+      window.open(url, "_blank", "");
     },
     save() {
       const form = this.$refs.createModal.form;

@@ -24,7 +24,7 @@
         <a-form-item v-show="false" label="父节点Id">
           <a-input v-decorator="['parentId', { initialValue: 0 }]" disabled />
         </a-form-item>
-        <a-form-item label="父节点">
+        <a-form-item label="上级视图">
           <template>
             <a-cascader
               :value="viewIdSelect"
@@ -183,7 +183,7 @@ export default {
     },
     onViewSelectChange(value) {
       if (value.length >= 4) {
-        this.$message.warn("视图深度不能超过4层");
+        this.$message.warning("视图深度不能超过4层");
         return;
       }
       this.viewIdSelect = value;

@@ -21,9 +21,9 @@ const routerMap = {
     name: "工作台",
     component: () => import("@/pages/dashboard/workplace"),
   },
-  analysis: {
-    name: "分析页",
-    component: () => import("@/pages/dashboard/analysis"),
+  index: {
+    name: "首页",
+    component: () => import("@/pages/dashboard/index"),
   },
   management: {
     name: "系统管理",
@@ -81,7 +81,27 @@ const routerMap = {
     name: "个人信息",
     component: () => import("@/pages/profile/Profile"),
   },
-  systeminfo: {
+  articles: {
+    name: "文章管理",
+    component: view.page,
+  },
+  articleEdit: {
+    name: "编写文章",
+    component: () => import("@/pages/article/ArticleEdit"),
+  },
+  articleList: {
+    name: "所有文章",
+    component: () => import("@/pages/article/ArticleList"),
+  },
+  articleCategory: {
+    name: "文章分类",
+    component: () => import("@/pages/article/ArticleCategory"),
+  },
+  comments: {
+    name: "评论管理",
+    component: () => import("@/pages/article/ArticleComment"),
+  },
+  systemInfo: {
     name: "系统信息",
     component: () => import("@/pages/systeminfo/SystemInfo"),
   },

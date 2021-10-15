@@ -25,7 +25,7 @@
         <a-form-item v-show="false" label="父节点Id">
           <a-input v-decorator="['parentId', { initialValue: 0 }]" disabled />
         </a-form-item>
-        <a-form-item label="父节点">
+        <a-form-item label="上级字典">
           <template>
             <a-cascader
               :value="dictionaryIdSelect"
@@ -191,7 +191,7 @@ export default {
     },
     onDictionaryIdSelectChange(value) {
       if (value.length >= 8) {
-        this.$message.warn("字典深度不能超过7级");
+        this.$message.warning("字典深度不能超过7级");
         return;
       }
       this.dictionaryIdSelect = value;

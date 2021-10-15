@@ -3,9 +3,9 @@
 // const BASE_URL = process.env.NODE_ENV === 'production' ? process.env.VUE_APP_API_BASE_URL : API_PROXY_PREFIX
 const BASE_URL = process.env.VUE_APP_API_BASE_URL;
 module.exports = {
-  ROUTES: `${BASE_URL}/api/v1/Menu/QueryViewMenu`,
+  ROUTES: `${BASE_URL}/api/v1/Menu/UserMenu`,
   GETAVATAR: `${BASE_URL}/api/v1/User/Avatar`,
-  GET_USER_ROLE_PERMISSION: `${BASE_URL}/api/v1/Permission/QueryUserRolePermission`, //角色权限列表
+  GET_USER_ROLE_PERMISSION: `${BASE_URL}/api/v1/Permission/UserRolePermission`, //角色权限列表
   //Account
   POST_LOGIN: `${BASE_URL}/api/v1/Account/Login`,
   POST_LOGOUT: `${BASE_URL}/api/v1/Account/RevokeToken`,
@@ -25,8 +25,8 @@ module.exports = {
   DELETE_MENU_ITEM: `${BASE_URL}/api/v1/Menu`,
   POST_MENU_ITEM: `${BASE_URL}/api/v1/Menu`,
   PUT_MENU_ITEM: `${BASE_URL}/api/v1/Menu`,
-  GET_MENU_TYPES: `${BASE_URL}/api/v1/Menu/GetMenuTypes`,
-  GET_MENU_NEXT_SORT_VALUE: `${BASE_URL}/api/v1/Menu/GetNextSortValue`,
+  GET_MENU_TYPES: `${BASE_URL}/api/v1/Menu/MenuTypes`,
+  GET_MENU_NEXT_SORT_VALUE: `${BASE_URL}/api/v1/Menu/NextSortValue`,
   GET_MENU_CASCADER: `${BASE_URL}/api/v1/Menu/CascaderList`,
   //API
   GET_API_LIST: `${BASE_URL}/api/v1/Api`,
@@ -50,7 +50,7 @@ module.exports = {
   DELETE_ROLE_ITEM: `${BASE_URL}/api/v1/Role`,
   POST_ROLE_ITEM: `${BASE_URL}/api/v1/Role`,
   PUT_ROLE_ITEM: `${BASE_URL}/api/v1/Role`,
-  GET_ROLE_NEXT_SORT_VALUE: `${BASE_URL}/api/v1/Role/GetNextSortValue`,
+  GET_ROLE_NEXT_SORT_VALUE: `${BASE_URL}/api/v1/Role/NextSortValue`,
   GET_ROLE_CASCADER: `${BASE_URL}/api/v1/Role/CascaderList`,
   //Cache
   GET_CACHE_LIST: `${BASE_URL}/api/v1/Cache`,
@@ -89,12 +89,24 @@ module.exports = {
   POST_DICTIONARY_ITEM: `${BASE_URL}/api/v1/Dictionary`,
   PUT_DICTIONARY_ITEM: `${BASE_URL}/api/v1/Dictionary`,
   GET_DICTIONARY_CASCADER: `${BASE_URL}/api/v1/Dictionary/CascaderList`,
-  GET_DICTIONARY_NEXT_SORT_VALUE: `${BASE_URL}/api/v1/Dictionary/GetNextSortValue`,
+  GET_DICTIONARY_NEXT_SORT_VALUE: `${BASE_URL}/api/v1/Dictionary/NextSortValue`,
   //File
   GET_FILE_LIST: `${BASE_URL}/api/v1/File/QueryByPage`,
   POST_FILE_ITEM: `${BASE_URL}/api/v1/File`,
   DELETE_FILE_ITEM: `${BASE_URL}/api/v1/File`,
   GET_FILE_ACCESSMODE_SELECTLIST: `${BASE_URL}/api/v1/File/AccessModeSelectList`,
+  //ArticleCategory
+  GET_ARTICLECATEGORY_LIST: `${BASE_URL}/api/v1/ArticleCategory`,
+  DELETE_ARTICLECATEGORY_ITEM: `${BASE_URL}/api/v1/ArticleCategory`,
+  POST_ARTICLECATEGORY_ITEM: `${BASE_URL}/api/v1/ArticleCategory`,
+  PUT_ARTICLECATEGORY_ITEM: `${BASE_URL}/api/v1/ArticleCategory`,
+  GET_ARTICLECATEGORY_CASCADER: `${BASE_URL}/api/v1/ArticleCategory/CascaderList`,
+  //Article
+  GET_ARTICLE_TAGS_SELECTLIST: `${BASE_URL}/api/v1/Article/AllTags`,
+  GET_ARTICLE_LIST: `${BASE_URL}/api/v1/Article`,
+  GET_ARTICLE_ITEM: `${BASE_URL}/api/v1/Article`,
+  DELETE_ARTICLE_ITEM: `${BASE_URL}/api/v1/Article`,
+  POST_PUT_ARTICLE_ITEM: `${BASE_URL}/api/v1/Article`,
   //Config
   GET_SYSTEM_HARDWARE_INFO: `${BASE_URL}/api/v1/Config/SystemHardwareInfo`,
 };

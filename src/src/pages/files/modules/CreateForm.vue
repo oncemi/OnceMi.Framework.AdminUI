@@ -20,7 +20,7 @@
         <a-form-item v-show="false" label="用户Id">
           <a-input v-decorator="['userId', { initialValue: 0 }]" disabled />
         </a-form-item>
-        <a-form-item label="访问权限（暂不支持）：">
+        <a-form-item label="访问权限：">
           <a-select
             v-decorator="['accessMode', { rules: [{ required: true, initialValue: 'PublicRead' }] }]"
             placeholder="请选择"

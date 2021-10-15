@@ -81,7 +81,7 @@
             <a-icon class="icon" type="alipay-circle" />
             <a-icon class="icon" type="taobao-circle" />
             <a-icon class="icon" type="weibo-circle" />
-            <router-link style="float: right" to="/dashboard/workplace">注册账户</router-link>
+            <router-link style="float: right" to="/dashboard/index">注册账户</router-link>
           </div>
         </a-form>
       </div>
@@ -118,21 +118,21 @@ export default {
   },
   mounted: async function() {
     if (checkAuthorization()) {
-      this.loadRoutes();
+      this.afterLoginRedirect();
     } else {
       if (this.isEnabledIdentityServer) {
         //IdentityServer登录
         login();
       } else {
-        //本地认证登录
-        this.loadPage = true;
         //是否记住密码
         if (this.token && this.token.refresh_token && this.token.isRemember) {
           let newToken = await localRefreshToken();
           if (newToken) {
-            this.loadRoutes();
+            this.afterLoginRedirect();
           }
         }
+        //本地认证登录
+        this.loadPage = true;
       }
     }
   },
@@ -205,7 +205,7 @@ export default {
               }
               this.logging = true;
               loadRoutes(result1.data.data);
-              const redirect = this.$route.query?.redirect ? this.$route.query.redirect : "/dashboard/analysis";
+              const redirect = this.$route.query?.redirect ? this.$route.query.redirect : "/dashboard/index";
               this.$router.push(redirect);
               this.$message.success("登录成功，欢迎回来", 3);
             })
@@ -217,7 +217,20 @@ export default {
           this.loginFailed(error);
         });
     },
+    afterLoginRedirect() {
+      let self = this;
+      getUserRoutes()
+        .then((result) => {
+          loadRoutes(result.data.data);
+          const redirect = self.$route.query?.redirect ? self.$route.query.redirect : "/dashboard/index";
+          self.$router.push(redirect);
+        })
+        .catch(function(error) {
+          this.loginFailed(error);
+        });
+    },
     loginFailed: function(error) {
+      console.error(error);
       if (error.response && error.response.status == 403) {
         this.$router.push("/403");
         this.$message.warning("登录失败，您没有访问此页面的权限！");
@@ -229,19 +242,6 @@ export default {
           this.$message.warning("登陆失败");
         }
       }
-    },
-    loadRoutes() {
-      let self = this;
-      getUserRoutes()
-        .then((result) => {
-          loadRoutes(result.data.data);
-          const redirect = self.$route.query?.redirect ? self.$route.query.redirect : "/dashboard/analysis";
-          self.$router.push(redirect);
-        })
-        .catch(function(error) {
-          console.error(error);
-          self.$router.push("/403");
-        });
     },
   },
 };

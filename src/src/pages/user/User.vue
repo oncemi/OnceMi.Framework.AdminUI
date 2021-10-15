@@ -82,15 +82,15 @@
                 </a-form-item>
               </a-col>
               <a-col class="searchBtn">
-                <a-button type="primary" @click="loadUser">查询</a-button>
-                <a-button style="margin-left: 8px" @click="reset">重置</a-button>
+                <a-button type="primary" icon="search" @click="loadUser">查询</a-button>
+                <a-button icon="close-circle" style="margin-left: 8px" @click="reset">重置</a-button>
               </a-col>
             </a-row>
           </a-form>
           <div>
             <a-space class="operator">
-              <a-button @click="add" type="primary">新建</a-button>
-              <a-button @click="deleteSelectItems" type="danger">删除</a-button>
+              <a-button @click="add" type="primary" icon="form">新建</a-button>
+              <a-button @click="deleteSelectItems" type="danger" icon="delete">删除</a-button>
             </a-space>
             <div>
               <a-table
@@ -607,7 +607,7 @@ export default {
     },
     onRoleSelectChange(value) {
       if (value.length >= 5) {
-        this.$message.warn("角色树深度不能超过5层");
+        this.$message.warning("角色树深度不能超过5层");
         return;
       }
       this.roleIdSelect = value;

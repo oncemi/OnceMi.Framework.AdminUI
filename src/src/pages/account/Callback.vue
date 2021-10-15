@@ -61,7 +61,7 @@ export default {
               }
               this.logging = true;
               loadRoutes(result1.data.data);
-              const redirect = this.$route.query?.redirect ? this.$route.query.redirect : "/dashboard/analysis";
+              const redirect = this.$route.query?.redirect ? this.$route.query.redirect : "/dashboard/index";
               this.$router.push(redirect);
               this.$message.success("登录成功，欢迎回来", 3);
             })

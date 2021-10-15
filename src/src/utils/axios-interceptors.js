@@ -13,8 +13,8 @@ const resperr = {
       message.error(`请求数据异常（Status:200），服务器返回内容为空`);
       return null;
     }
-    const code = response.data.code;
-    if (code != 0) {
+    const code = response.data?.code;
+    if (code && code != 0) {
       message.warning(`${response.data.message}(错误码：${response.data.code})`);
     }
     return response;
@@ -37,6 +37,9 @@ const resperr = {
       return Promise.reject(error);
     }
     switch (response.status) {
+      case 301:
+      case 302:
+        break;
       case 400:
         {
           let errMsg = response.data?.message

@@ -217,7 +217,7 @@ export default {
           const localConfig = localStorage.getItem(process.env.VUE_APP_SETTING_KEY);
           if (localConfig) {
             console.warn("检测到本地有历史保存的主题配置，想要要拷贝的配置代码生效，您可能需要先重置配置");
-            this.$message.warn("检测到本地有历史保存的主题配置，想要要拷贝的配置代码生效，您可能需要先重置配置", 5);
+            this.$message.warning("检测到本地有历史保存的主题配置，想要要拷贝的配置代码生效，您可能需要先重置配置", 5);
           }
         });
         clipboard.destroy();

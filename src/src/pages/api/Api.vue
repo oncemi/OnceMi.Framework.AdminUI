@@ -21,21 +21,23 @@
             </a-col>
           </a-row>
         </div>
-        <span style="float: right;">
-          <a-button type="primary" @click="load">查询</a-button>
-          <a-button style="margin-left: 8px" @click="reset">重置</a-button>
-          <a @click="toggleAdvanced" style="margin-left: 8px">
-            {{ advanced ? "收起" : "展开" }}
-            <a-icon :type="advanced ? 'up' : 'down'" />
-          </a>
+        <span class="search-left">
+          <a-space>
+            <a-button type="primary" icon="search" @click="load">查询</a-button>
+            <a-button icon="close-circle" @click="reset">重置</a-button>
+            <a @click="toggleAdvanced">
+              {{ advanced ? "收起" : "展开" }}
+              <a-icon :type="advanced ? 'up' : 'down'" />
+            </a>
+          </a-space>
         </span>
       </a-form>
     </div>
     <div>
       <a-space class="operator">
-        <a-button @click="add" type="primary">新建</a-button>
-        <a-button @click="deleteSelectItems" type="danger">删除</a-button>
-        <a-button @click="resolve">同步</a-button>
+        <a-button @click="add" type="primary" icon="form">新建</a-button>
+        <a-button @click="deleteSelectItems" type="danger" icon="delete">删除</a-button>
+        <a-button @click="resolve" icon="sync">同步</a-button>
       </a-space>
       <div>
         <a-table

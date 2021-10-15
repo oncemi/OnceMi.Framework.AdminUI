@@ -62,7 +62,7 @@ class ids4Account {
 
   // Renew the token manually
   refreshToken = () => {
-    let newToken = undefined;
+    let newToken = null;
     if (this.refreshTokenPromise != null) {
       return this.refreshTokenPromise.then(() => {
         let lastRefeshToken = store.getters["account/token"];
@@ -220,7 +220,7 @@ class localAccount {
         return lastRefeshToken;
       });
     }
-    let newToken = undefined;
+    let newToken = null;
     let oldToken = store.getters["account/token"];
     if (!oldToken || !oldToken.refresh_token) {
       return newToken;

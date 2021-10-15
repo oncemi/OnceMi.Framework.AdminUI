@@ -27,7 +27,7 @@
           <detail-list-item term="创建时间">{{ userInfo.createdTime }}</detail-list-item>
         </detail-list>
         <a-divider style="margin-bottom: 32px" />
-        <a-button type="primary" @click="edit">
+        <a-button type="primary" icon="edit" @click="edit">
           修改信息
         </a-button>
         <create-form ref="createModal" :visible="visible" :model="mdl" @cancel="cancel" @ok="save" />
@@ -68,7 +68,7 @@
           </a-form-item>
 
           <a-form-item :wrapper-col="{ span: 12, offset: 5 }">
-            <a-button type="primary" html-type="submit">
+            <a-button type="primary" icon="save" html-type="submit">
               保存
             </a-button>
           </a-form-item>

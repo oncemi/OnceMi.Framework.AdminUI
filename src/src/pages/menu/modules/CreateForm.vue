@@ -24,7 +24,7 @@
         <a-form-item v-show="false" label="父菜单Id">
           <a-input v-decorator="['parentId', { initialValue: 0 }]" disabled />
         </a-form-item>
-        <a-form-item label="父菜单">
+        <a-form-item label="上级菜单">
           <template>
             <a-cascader
               :value="menuIdSelect"
@@ -51,7 +51,7 @@
         <a-form-item v-show="false" label="视图Id">
           <a-input v-decorator="['viewId', { initialValue: 0 }]" disabled />
         </a-form-item>
-        <a-form-item label="视图" v-if="viewOrGroupSelected">
+        <a-form-item label="视图" v-if="viewOrGroupSelected" :required="true">
           <template>
             <a-cascader
               :value="viewIdSelect"
@@ -67,7 +67,7 @@
         <a-form-item v-show="false" label="接口Id">
           <a-input v-decorator="['apiId', { initialValue: 0 }]" disabled />
         </a-form-item>
-        <a-form-item label="接口" v-if="apiSelected">
+        <a-form-item label="接口" v-if="apiSelected" :required="true">
           <template>
             <a-cascader
               :value="apiIdSelect"
@@ -294,7 +294,7 @@ export default {
     },
     onMenuIdChange(value) {
       if (value.length > 4) {
-        this.$message.warn("菜单深度不能超过5层");
+        this.$message.warning("菜单深度不能超过5层");
         return;
       }
       this.menuIdSelect = value;

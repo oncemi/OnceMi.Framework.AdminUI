@@ -159,7 +159,7 @@
         </a-row>
         <a-row v-show="noHidePasswordInput">
           <a-col :span="12" class="input-col">
-            <a-form-item label="组织">
+            <a-form-item label="组织" :required="true">
               <a-tree-select
                 v-model="organizeSelect"
                 placeholder="请选择用户组织"
@@ -177,7 +177,7 @@
             </a-form-item>
           </a-col>
           <a-col :span="12" class="input-col">
-            <a-form-item label="角色">
+            <a-form-item label="角色" :required="true">
               <a-tree-select
                 v-model="roleSelect"
                 placeholder="请选择用户角色"

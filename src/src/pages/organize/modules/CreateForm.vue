@@ -24,7 +24,7 @@
         <a-form-item v-show="false" label="父节点Id">
           <a-input v-decorator="['parentId', { initialValue: 0 }]" disabled />
         </a-form-item>
-        <a-form-item label="父组织">
+        <a-form-item label="上级组织">
           <template>
             <a-cascader
               :value="organizeIdSelect"
@@ -191,7 +191,7 @@ export default {
         self.options = resultData.data;
         self.organizeListData.splice(0);
         self.generateOrganizeList(self.options);
-        self.setCascader();
+        this.setCascader("parentId", this.organizeListData, this.organizeIdSelect);
 
         request(GET_ORGANIZETYPE_SELECTLIST, METHOD.GET).then((orgResult) => {
           if (orgResult.data.code != 0) {
@@ -224,24 +224,24 @@ export default {
         }
       }
     },
-    setCascader() {
-      let parentId = this.form.getFieldValue("parentId");
+    setCascader(fieldName, data, selectList) {
+      let parentId = this.form.getFieldValue(fieldName);
       if (!parentId || parentId <= 0) {
         return;
       }
       let parentKeys = [];
       do {
-        for (let i = 0; i < this.organizeListData.length; i++) {
-          if (this.organizeListData[i].id === parentId) {
-            parentKeys.push(this.organizeListData[i].id);
-            parentId = this.organizeListData[i].parentId;
+        for (let i = 0; i < data.length; i++) {
+          if (data[i].id === parentId) {
+            parentKeys.push(data[i].id);
+            parentId = data[i].parentId;
             break;
           }
         }
       } while (parentId != null && parentId > 0);
       if (parentKeys.length > 0) {
         for (let i = parentKeys.length - 1; i >= 0; i--) {
-          this.organizeIdSelect.push(parentKeys[i]);
+          selectList.push(parentKeys[i]);
         }
       }
     },
@@ -250,7 +250,7 @@ export default {
     },
     onOrganizeIdSelectChange(value) {
       if (value.length >= 8) {
-        this.$message.warn("组织机构深度不能超过7级");
+        this.$message.warning("组织机构深度不能超过7级");
         return;
       }
       this.organizeIdSelect = value;

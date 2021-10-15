@@ -24,7 +24,7 @@
         <a-form-item v-show="false" label="父节点Id">
           <a-input v-decorator="['parentId', { initialValue: 0 }]" disabled />
         </a-form-item>
-        <a-form-item label="父节点">
+        <a-form-item label="上级角色">
           <template>
             <a-cascader
               :value="roleIdSelect"
@@ -58,7 +58,7 @@
               change-on-select
               @change="onOrganizeSelectChange"
               :field-names="{ label: 'name', value: 'id', children: 'children' }"
-              placeholder="请选择"
+              placeholder="请选择组织机构"
             />
           </template>
         </a-form-item>
@@ -216,7 +216,7 @@ export default {
     },
     onRoleSelectChange(value) {
       if (value.length >= 5) {
-        this.$message.warn("角色树深度不能超过5层");
+        this.$message.warning("角色树深度不能超过5层");
         return;
       }
       this.roleIdSelect = value;
