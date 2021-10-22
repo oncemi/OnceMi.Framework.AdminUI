@@ -1,5 +1,5 @@
 import { UserManager, WebStorageStateStore } from "oidc-client";
-import { POST_LOGOUT, POST_REFESH } from "@/services/api";
+import { POST_LOGOUT, POST_REFESH_TOKEN } from "@/services/api";
 import { request, METHOD } from "@/utils/request";
 import store from "@/store";
 
@@ -225,7 +225,7 @@ class localAccount {
     if (!oldToken || !oldToken.refresh_token) {
       return newToken;
     }
-    this.refreshTokenPromise = request(POST_REFESH, METHOD.POST, {
+    this.refreshTokenPromise = request(POST_REFESH_TOKEN, METHOD.POST, {
       Token: oldToken.refresh_token,
     })
       .then((result) => {
