@@ -27,9 +27,9 @@ userManager.events.addUserSignedOut(() => {
   console.log("Events->addUserSignedOut");
 });
 
-userManager.events.addAccessTokenExpiring(function() {
+userManager.events.addAccessTokenExpiring(function () {
   console.log("AccessToken will expiring, start refresh token...");
-  refreshToken().catch(function(err) {
+  refreshToken().catch(function (err) {
     console.log("[IdentityServer]RefreshToken failed, " + err.message);
     console.error(err);
   });
@@ -133,7 +133,7 @@ class ids4Account {
           return user.profile;
         }
       })
-      .catch(function(err) {
+      .catch(function (err) {
         console.error(err);
         return null;
       });

@@ -1,7 +1,7 @@
 <template>
   <a-modal
     :title="title"
-    :width="580"
+    :width="550"
     :visible="visible"
     :confirmLoading="loading"
     :maskClosable="false"
@@ -18,7 +18,7 @@
     "
   >
     <a-spin :spinning="loading">
-      <a-form :form="form" v-bind="formLayout">
+      <a-form :form="form" v-bind="formLayout" style="margin-top: 8px">
         <a-form-item v-show="false" label="主键ID">
           <a-input v-decorator="['id', { initialValue: 0 }]" disabled />
         </a-form-item>
@@ -29,14 +29,22 @@
           />
         </a-form-item>
         <a-form-item label="分组">
-          <a-select v-decorator="['groupId', { rules: [{ required: true }] }]" placeholder="任务组">
+          <a-select
+            v-decorator="['groupId', { rules: [{ required: true, message: '请选择任务分组' }] }]"
+            placeholder="任务组"
+          >
             <a-select-option v-for="item in groupSelectList" :key="item.value">
               {{ item.name }}
             </a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="Cron" help="表达式生成器：https://www.bejson.com/othertools/cron/">
-          <a-input v-decorator="['cron', { rules: [{ required: true }] }]" placeholder="例：0/10 * * * * ? " />
+        <a-form-item label="Cron">
+          <a-input-search
+            enter-button="编辑"
+            @search="showEditCronForm"
+            v-decorator="['cron', { rules: [{ required: true, message: 'Cron表达式不能为空' }] }]"
+            placeholder="例：0/10 * * * * ? "
+          />
         </a-form-item>
         <a-form-item label="开始时间">
           <a-date-picker
@@ -54,24 +62,16 @@
         </a-form-item>
         <a-form-item label="请求地址">
           <a-input
-            v-decorator="['url', { rules: [{ required: true }] }]"
+            v-decorator="['url', { rules: [{ required: true, message: '请求地址不能为空' }] }]"
             placeholder="支持本地地址（/xx/xx）和远程地址（http://baidu...）"
           />
         </a-form-item>
         <a-form-item label="请求方式">
           <a-radio-group v-decorator="['requestMethod', { rules: [{ required: true, initialValue: 'Get' }] }]">
-            <a-radio value="Get">
-              Get
-            </a-radio>
-            <a-radio value="Post">
-              Post
-            </a-radio>
-            <a-radio value="Put">
-              Put
-            </a-radio>
-            <a-radio value="Delete">
-              Delete
-            </a-radio>
+            <a-radio value="Get"> Get </a-radio>
+            <a-radio value="Post"> Post </a-radio>
+            <a-radio value="Put"> Put </a-radio>
+            <a-radio value="Delete"> Delete </a-radio>
           </a-radio-group>
         </a-form-item>
         <a-form-item label="请求头">
@@ -88,15 +88,9 @@
         </a-form-item>
         <a-form-item label="发送通知">
           <a-radio-group v-decorator="['noticePolicy', { rules: [{ required: true, initialValue: 'No' }] }]">
-            <a-radio value="No">
-              不发送
-            </a-radio>
-            <a-radio value="Error">
-              仅异常
-            </a-radio>
-            <a-radio value="All">
-              全部发送
-            </a-radio>
+            <a-radio value="No"> 不发送 </a-radio>
+            <a-radio value="Error"> 仅异常 </a-radio>
+            <a-radio value="All"> 全部发送 </a-radio>
           </a-radio-group>
         </a-form-item>
         <a-form-item v-show="false" label="角色组Id">
@@ -120,12 +114,20 @@
         </a-form-item>
       </a-form>
     </a-spin>
+    <crontab-edit-form
+      ref="createModal"
+      :visible="cronEditvisible"
+      :model="cronEditModel"
+      @cancel="cancelEditCron"
+      @ok="saveEditCron"
+    />
   </a-modal>
 </template>
 
 <script>
 import pick from "lodash.pick";
 import moment from "moment";
+import crontabEditForm from "./CronEditForm";
 import { GET_ROLE_CASCADER, GET_JOB_GROUP_SELECT_LIST } from "@/services/api";
 import { request, METHOD } from "@/utils/request";
 
@@ -139,6 +141,9 @@ export default {
       type: Object,
       default: () => null,
     },
+  },
+  components: {
+    crontabEditForm,
   },
   data() {
     this.formLayout = {
@@ -175,6 +180,10 @@ export default {
       groupListData: [],
       //任务分组
       groupSelectList: [],
+      //
+      cronOldValue: "",
+      cronEditModel: null,
+      cronEditvisible: false,
     };
   },
   created() {
@@ -271,6 +280,21 @@ export default {
       }
       this.form.setFieldsValue({ noticeRoleId: value[value.length - 1] });
     },
+    showEditCronForm() {
+      this.cronOldValue = this.form.getFieldValue("cron");
+      this.cronEditModel = {
+        value: this.cronOldValue ? this.cronOldValue : "* * * * * ?",
+      };
+      this.cronEditvisible = true;
+    },
+    cancelEditCron() {
+      this.form.setFieldsValue({ cron: this.cronOldValue });
+      this.cronEditvisible = false;
+    },
+    saveEditCron() {
+      this.form.setFieldsValue({ cron: this.cronEditModel.value });
+      this.cronEditvisible = false;
+    },
   },
 };
 </script>
@@ -281,6 +305,6 @@ export default {
 }
 
 /deep/ .ant-modal-body {
-  padding: 10px;
+  padding: 0px 0px 3px 0px;
 }
 </style>

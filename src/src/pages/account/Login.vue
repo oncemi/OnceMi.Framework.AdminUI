@@ -6,7 +6,7 @@
           <img alt="logo" class="logo" src="@/assets/img/logo.png" />
           <span class="title">{{ systemName }}</span>
         </div>
-        <div class="desc">基于.NET 5和Vue开发的企业级前后端分离权限管理开发框架</div>
+        <div class="desc">基于.NET 6和Vue开发的企业级前后端分离权限管理开发框架</div>
       </div>
       <div class="login">
         <a-form @submit="onSubmit" :form="form">

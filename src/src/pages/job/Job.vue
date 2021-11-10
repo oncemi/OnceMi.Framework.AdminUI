@@ -40,8 +40,8 @@
               <a-button @click="jobGroupEdit" icon="appstore">分组管理</a-button>
             </a-space>
           </a-col>
-          <a-col :span="12" style="text-align: right;">
-            <div style="margin-top: 5px;">
+          <a-col :span="12" style="text-align: right">
+            <div style="margin-top: 5px">
               自动刷新： <a-switch v-model="isEnableAutoRefesh" @change="onAutoRefeshChange" />
             </div>
           </a-col>
@@ -82,18 +82,10 @@
                   </a-button>
                   <a-dropdown>
                     <a-menu slot="overlay" @click="(e) => handleMenuClick(e, record)">
-                      <a-menu-item key="logs">
-                        查看日志
-                      </a-menu-item>
-                      <a-menu-item key="trigger">
-                        立即运行
-                      </a-menu-item>
-                      <a-menu-item key="stop">
-                        停止
-                      </a-menu-item>
-                      <a-menu-item key="delete">
-                        删除
-                      </a-menu-item>
+                      <a-menu-item key="logs"> 查看日志 </a-menu-item>
+                      <a-menu-item key="trigger"> 立即运行 </a-menu-item>
+                      <a-menu-item key="stop"> 停止 </a-menu-item>
+                      <a-menu-item key="delete"> 删除 </a-menu-item>
                     </a-menu>
                     <a-button type="primary" size="small" ghost> 更多 <a-icon type="down" /> </a-button>
                   </a-dropdown>
@@ -264,13 +256,10 @@ export default {
     page() {
       this.load(false);
     },
-    isEnableAutoRefesh(value, oldValue) {
+    isEnableAutoRefesh() {
       //开关自动刷新
       this.autoRefesh();
     },
-  },
-  authorize: {
-    deleteRecord: "delete",
   },
   created() {
     this.load(false);
