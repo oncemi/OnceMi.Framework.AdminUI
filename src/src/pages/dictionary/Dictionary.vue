@@ -4,14 +4,14 @@
       <a-card
         :title="$t('dictionaryTreeTitle')"
         :loading="loadingDictionarys"
-        style="margin-bottom: 24px;"
+        style="margin-bottom: 24px"
         :bordered="false"
         :body-style="{ padding: 0 }"
         :scroll="{ y: 500 }"
       >
         <div>
           <template>
-            <a-row style="margin: 8px 0px 2px 0px;">
+            <a-row style="margin: 8px 0px 2px 0px">
               <a-space class="operator">
                 <a-button @click="add" type="primary" icon="form" size="small">新建</a-button>
                 <a-button @click="deleteDictionary" type="danger" icon="delete" size="small">删除</a-button>
@@ -19,7 +19,7 @@
             </a-row>
             <div>
               <a-input-search
-                style="margin-bottom: 3px;margin-left: 10px;width: 95%"
+                style="margin-bottom: 3px; margin-left: 10px; width: 95%"
                 placeholder="Search"
                 @change="onDictionarySearchChange"
               />
@@ -59,13 +59,13 @@
     <a-col style="padding: 0 12px" :xl="16" :lg="16" :md="12" :sm="12" :xs="12">
       <a-card
         :title="$t('dictionaryListTitle')"
-        style="margin-bottom: 24px;"
+        style="margin-bottom: 24px"
         :loading="loadingDictionarys"
         :bordered="false"
         :body-style="{ padding: 0, height: '565px' }"
       >
         <div slot="extra">
-          <a-button @click="reload" type="link">{{ $t("refeshDictionaryList") }}</a-button>
+          <a-button @click="load" type="link">{{ $t("refeshDictionaryList") }}</a-button>
         </div>
         <template>
           <a-spin :spinning="loading">
@@ -104,9 +104,7 @@
                 <a-switch v-decorator="['isEnabled', { valuePropName: 'checked', initialValue: true }]" />
               </a-form-item>
               <a-form-item :wrapper-col="{ span: 12, offset: 6 }">
-                <a-button type="primary" html-type="submit">
-                  保存
-                </a-button>
+                <a-button type="primary" html-type="submit"> 保存 </a-button>
               </a-form-item>
             </a-form>
           </a-spin>
@@ -157,7 +155,7 @@ export default {
     };
   },
   created() {
-    this.reload();
+    this.load();
     this.form = this.$form.createForm(this);
   },
   watch: {
@@ -166,7 +164,7 @@ export default {
     },
   },
   methods: {
-    reload() {
+    load() {
       request(GET_DICTIONARY_TREE, METHOD.GET).then((result) => {
         if (result.data.code != 0) {
           return;
@@ -200,17 +198,20 @@ export default {
     loadDicDetail(dicId) {
       // 重置表单数据
       this.form.resetFields();
+      if (!dicId) {
+        return;
+      }
       this.loading = true;
       this.fields.forEach((v) => this.form.getFieldDecorator(v));
       request(GET_DICTIONARY_ITEM, METHOD.GET, {
         Id: dicId,
         IncludeChild: false,
       }).then((result) => {
+        this.loading = false;
         if (result.data.code != 0) {
           return;
         }
         this.form.setFieldsValue(pick(result.data.data, this.fields));
-        this.loading = false;
       });
     },
     saveDicDetail(e) {
@@ -233,12 +234,13 @@ export default {
               }
               if (oldValue.sord != values.sort || oldValue.name != values.name) {
                 this.oldSelectDictionaryId = values.id;
-                this.reload();
+                this.load();
               }
               this.$message.success("数据字典修改成功");
             })
-            .catch(() => {
+            .catch((error) => {
               this.loading = false;
+              console.error(error);
             });
         } else {
           this.loading = false;
@@ -339,7 +341,7 @@ export default {
               form.resetFields();
               this.$message.success("数据字典创建成功");
               this.oldSelectDictionaryId = this.selectDictionaryId;
-              this.reload();
+              this.load();
             })
             .catch(() => {
               this.$refs.createModal.loading = false;
@@ -368,24 +370,22 @@ export default {
         }
       }
       let delArgs = [self.selectDictionaryId];
-      self.$confirm({
+      this.$confirm({
         title: `确认删除数据字典【${name}】吗？`,
         content: "警告！如果包含子节点，子节点中的字典将一并删除。",
+        okType: "danger",
         onOk() {
-          return new Promise((resolve, reject) => {
-            request(DELETE_DICTIONARY_ITEM, METHOD.DELETE, delArgs).then((result) => {
-              let resultData = result.data;
-              if (resultData.code != 0) {
-                reject();
+          request(DELETE_DICTIONARY_ITEM, METHOD.DELETE, delArgs)
+            .then((result) => {
+              if (result.data.code != 0) {
                 return;
               }
-              self.reload();
-              resolve();
+              self.load();
               self.$message.success(`数据字典【${name}】及其子节点字典已删除`);
+            })
+            .catch((err) => {
+              if (err) console.error(err);
             });
-          }).catch((err) => {
-            this.$message.error(err.message);
-          });
         },
         onCancel() {},
       });

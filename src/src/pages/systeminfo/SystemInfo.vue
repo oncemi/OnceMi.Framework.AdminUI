@@ -61,16 +61,21 @@ export default {
   methods: {
     load() {
       this.loading = true;
-      request(GET_SYSTEM_HARDWARE_INFO, METHOD.GET).then((result) => {
-        if (result.data.code != 0) {
-          return;
-        }
-        this.hardwareInfo = result.data.data;
-        if (this.hardwareInfo.cpuInfos.length > 0) {
-          this.cpuinfo = this.hardwareInfo.cpuInfos[0];
-        }
-        this.loading = false;
-      });
+      request(GET_SYSTEM_HARDWARE_INFO, METHOD.GET)
+        .then((result) => {
+          if (result.data.code != 0) {
+            return;
+          }
+          this.hardwareInfo = result.data.data;
+          if (this.hardwareInfo.cpuInfos.length > 0) {
+            this.cpuinfo = this.hardwareInfo.cpuInfos[0];
+          }
+          this.loading = false;
+        })
+        .catch((error) => {
+          this.loading = false;
+          console.error(error);
+        });
     },
   },
 };

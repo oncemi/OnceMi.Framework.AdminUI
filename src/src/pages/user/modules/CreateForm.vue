@@ -30,20 +30,18 @@
               <a-avatar :size="80" icon="user" :src="avatarImgData" shape="square" />
             </a-form-item>
           </a-col>
-          <a-col :span="12" class="input-col" style="margin-top: 56px;margin-left: -130px;">
+          <a-col :span="12" class="input-col" style="margin-top: 56px; margin-left: -130px">
             <a-button
               type="primary"
               ghost
               size="small"
               icon="upload"
               @click="toggleShowAvatarUploadForm"
-              style="margin-right: 5px;"
+              style="margin-right: 5px"
             >
               上传
             </a-button>
-            <a-button type="danger" ghost size="small" icon="delete" @click="cleanAvatarUpload">
-              清除
-            </a-button>
+            <a-button type="danger" ghost size="small" icon="delete" @click="cleanAvatarUpload"> 清除 </a-button>
             <avatarUpload
               field="img"
               @crop-success="cropSuccess"
@@ -87,7 +85,7 @@
               <a-date-picker
                 v-decorator="['birthDay', { rules: [{ required: false }] }]"
                 placeholder="出生日期"
-                style="width: 212.2px;"
+                style="width: 212.2px"
               />
             </a-form-item>
           </a-col>
@@ -134,7 +132,7 @@
             <a-form-item label="号码已确认">
               <a-switch
                 v-decorator="['phoneNumberConfirmed', { valuePropName: 'checked', initialValue: true }]"
-                style="margin-left: 10px;"
+                style="margin-left: 10px"
               />
             </a-form-item>
           </a-col>
@@ -152,7 +150,7 @@
             <a-form-item label="邮箱已确认">
               <a-switch
                 v-decorator="['emailConfirmed', { valuePropName: 'checked', initialValue: true }]"
-                style="margin-left: 10px;"
+                style="margin-left: 10px"
               />
             </a-form-item>
           </a-col>
@@ -308,11 +306,10 @@ export default {
         this.avatarImgData = this.model.data.avatar;
       }
       request(GET_ORGANIZE_CASCADER, METHOD.GET).then((result) => {
-        let resultData = result.data;
-        if (resultData.code != 0) {
+        if (result.data.code != 0) {
           return;
         }
-        this.organizeTreeData = resultData.data;
+        this.organizeTreeData = result.data.data;
         if (
           (this.model.type === "update" || this.model.type === "view") &&
           this.model.data.organizes &&
@@ -327,11 +324,10 @@ export default {
           }
         }
         request(GET_ROLE_CASCADER, METHOD.GET).then((roleResult) => {
-          let resultData = roleResult.data;
-          if (resultData.code != 0) {
+          if (roleResult.data.code != 0) {
             return;
           }
-          this.roleTreeData = resultData.data;
+          this.roleTreeData = roleResult.data.data;
           if (
             (this.model.type === "update" || this.model.type === "view") &&
             this.model.data.roles &&

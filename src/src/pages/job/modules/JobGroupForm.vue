@@ -12,7 +12,7 @@
       }
     "
   >
-    <a-row style="margin-top: 10px;margin-bottom: 10px">
+    <a-row style="margin-top: 10px; margin-bottom: 10px">
       <a-col :span="12">
         <a-space class="operator" style="margin-left: 20px">
           <a-button @click="add" type="primary" icon="form" size="small">新建</a-button>
@@ -143,19 +143,18 @@ export default {
           typeof this.orderFiled != "undefined" && this.orderFiled.length > 0 ? `${this.orderFiled},${this.sort}` : "",
       })
         .then((result) => {
-          let resultData = result.data;
-          if (resultData.code != 0) {
+          if (result.data.code != 0) {
             return;
           }
           this.data.splice(0);
-          this.data = resultData.data.pageData;
-          this.pagination.total = resultData.data.count;
+          this.data = result.data.data.pageData;
+          this.pagination.total = result.data.data.count;
           this.selectedRowKeys.splice(0);
           this.loading = false;
         })
         .catch((error) => {
-          console.error(error);
           this.loading = false;
+          console.error(error);
         });
     },
     add() {
@@ -243,17 +242,20 @@ export default {
         message = `确认删除“${records.name}”吗？`;
         delArgs.push(records.id);
       }
-      self.$confirm({
+      this.$confirm({
         title: message,
         onOk() {
-          return request(DELETE_JOB_GROUP_ITEM, METHOD.DELETE, delArgs).then((result) => {
-            let resultData = result.data;
-            if (resultData.code != 0) {
-              return;
-            }
-            self.$message.success("删除成功");
-            self.load(false);
-          });
+          return request(DELETE_JOB_GROUP_ITEM, METHOD.DELETE, delArgs)
+            .then((result) => {
+              if (result.data.code != 0) {
+                return;
+              }
+              self.$message.success("删除成功");
+              self.load(false);
+            })
+            .catch((err) => {
+              if (err) console.error(err);
+            });
         },
         onCancel() {},
       });

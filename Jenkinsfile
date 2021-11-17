@@ -3,7 +3,7 @@ pipeline {
 	
 	environment {
         DOCKER_IMAGE_NAME = 'oncemi_framework_adminui'
-        EXPOSE_PORT = '50010'
+        EXPOSE_PORT = '50005'
     }
 
     stages {

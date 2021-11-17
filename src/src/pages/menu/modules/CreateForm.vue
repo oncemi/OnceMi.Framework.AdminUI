@@ -201,34 +201,31 @@ export default {
       this.loading = true;
 
       request(GET_MENU_CASCADER, METHOD.GET).then((result) => {
-        let resultData = result.data;
-        if (resultData.code != 0) {
+        if (result.data.code != 0) {
           return;
         }
         this.menuOptions.splice(0);
-        this.menuOptions = resultData.data;
+        this.menuOptions = result.data.data;
         this.menuListData.splice(0);
         this.generateMenuList(this.menuOptions);
         this.setCascader("parentId", this.menuListData, this.menuIdSelect);
 
         request(GET_VIEW_CASCADER, METHOD.GET).then((viewResult) => {
-          let resultData = viewResult.data;
-          if (resultData.code != 0) {
+          if (viewResult.data.code != 0) {
             return;
           }
           this.viewOptions.splice(0);
-          this.viewOptions = resultData.data;
+          this.viewOptions = viewResult.data.data;
           this.viewListData.splice(0);
           this.generateViewList(this.viewOptions);
           this.setCascader("viewId", this.viewListData, this.viewIdSelect);
 
           request(GET_API_CASCADER, METHOD.GET).then((apiResult) => {
-            let resultData = apiResult.data;
-            if (resultData.code != 0) {
+            if (apiResult.data.code != 0) {
               return;
             }
             this.apiOptions.splice(0);
-            this.apiOptions = resultData.data;
+            this.apiOptions = apiResult.data.data;
             this.apiListData.splice(0);
             this.generateApiList(this.apiOptions);
             this.setCascader("apiId", this.apiListData, this.apiIdSelect);

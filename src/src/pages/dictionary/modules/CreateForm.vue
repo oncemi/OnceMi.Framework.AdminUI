@@ -134,19 +134,23 @@ export default {
       this.dictionaryIdSelect = [];
       this.loading = true;
       let self = this;
-      request(GET_DICTIONARY_CASCADER, METHOD.GET).then((result) => {
-        let resultData = result.data;
-        if (resultData.code != 0) {
-          return;
-        }
-        self.options.splice(0);
-        self.options = resultData.data;
-        self.dictionaryListData.splice(0);
-        self.generateDictionaryList(self.options);
-        self.setCascader();
+      request(GET_DICTIONARY_CASCADER, METHOD.GET)
+        .then((result) => {
+          if (result.data.code != 0) {
+            return;
+          }
+          self.options.splice(0);
+          self.options = result.data.data;
+          self.dictionaryListData.splice(0);
+          self.generateDictionaryList(self.options);
+          self.setCascader();
 
-        this.loading = false;
-      });
+          this.loading = false;
+        })
+        .catch((error) => {
+          this.loading = false;
+          console.error(error);
+        });
     },
     loadMaxSort(parentId) {
       if (!parentId || parentId == 0) {

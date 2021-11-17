@@ -45,9 +45,7 @@
           <p class="ant-upload-drag-icon">
             <a-icon type="inbox" />
           </p>
-          <p class="ant-upload-text">
-            选择或拖动文件到此区域上传
-          </p>
+          <p class="ant-upload-text">选择或拖动文件到此区域上传</p>
         </a-upload-dragger>
       </a-form>
     </a-spin>
@@ -122,16 +120,21 @@ export default {
     load() {
       this.loading = true;
       this.fileList = [];
-      request(GET_FILE_ACCESSMODE_SELECTLIST, METHOD.GET).then((orgResult) => {
-        if (orgResult.data.code != 0) {
-          return;
-        }
-        this.typeSelectList.splice(0);
-        orgResult.data.data.forEach((r) => {
-          this.typeSelectList.push(r);
+      request(GET_FILE_ACCESSMODE_SELECTLIST, METHOD.GET)
+        .then((result) => {
+          if (result.data.code != 0) {
+            return;
+          }
+          this.typeSelectList.splice(0);
+          result.data.data.forEach((r) => {
+            this.typeSelectList.push(r);
+          });
+          this.loading = false;
+        })
+        .catch((error) => {
+          this.loading = false;
+          console.error(error);
         });
-        this.loading = false;
-      });
     },
     handleChange(info) {
       const status = info.file.status;
@@ -177,20 +180,16 @@ export default {
         return false;
       }
       let delArgs = [id];
-      return new Promise((resolve, reject) => {
-        return request(DELETE_FILE_ITEM, METHOD.DELETE, delArgs).then((result) => {
-          let resultData = result.data;
-          if (resultData.code != 0) {
-            reject(false);
+      return request(DELETE_FILE_ITEM, METHOD.DELETE, delArgs)
+        .then((result) => {
+          if (result.data.code != 0) {
             return;
           }
-          resolve();
           this.$message.success(`移除文件【${file.name}】成功`);
+        })
+        .catch((err) => {
+          if (err) console.error(err);
         });
-      }).catch((err) => {
-        this.$message.error(err.message);
-        console.error(err);
-      });
     },
     onTypeChange(value) {
       //

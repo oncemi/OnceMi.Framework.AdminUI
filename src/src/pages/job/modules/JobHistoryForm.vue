@@ -39,9 +39,7 @@
           </a-tooltip>
         </span>
         <span slot="btnRefesh">
-          <a-button type="primary">
-            刷新
-          </a-button>
+          <a-button type="primary"> 刷新 </a-button>
         </span>
       </a-table>
     </a-spin>
@@ -153,18 +151,17 @@ export default {
           typeof this.orderFiled != "undefined" && this.orderFiled.length > 0 ? `${this.orderFiled},${this.sort}` : "",
       })
         .then((result) => {
-          let resultData = result.data;
-          if (resultData.code != 0) {
+          if (result.data.code != 0) {
             return;
           }
           this.data.splice(0);
-          this.data = resultData.data.pageData;
-          this.pagination.total = resultData.data.count;
+          this.data = result.data.data.pageData;
+          this.pagination.total = result.data.data.count;
           this.loading = false;
         })
         .catch((error) => {
-          console.error(error);
           this.loading = false;
+          console.error(error);
         });
     },
     onTableChange(pagination, filters, sorter) {

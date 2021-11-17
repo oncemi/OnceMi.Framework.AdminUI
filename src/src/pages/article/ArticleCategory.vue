@@ -165,22 +165,21 @@ export default {
           typeof this.orderFiled != "undefined" && this.orderFiled.length > 0 ? `${this.orderFiled},${this.sort}` : "",
       })
         .then((result) => {
-          let resultData = result.data;
-          if (resultData.code != 0) {
+          if (result.data.code != 0) {
             return;
           }
-
           this.data.splice(0);
           this.selectedRowKeys.splice(0);
           this.expandedRowKeys.splice(0);
 
-          this.formatData(resultData.data.pageData);
-          this.data = resultData.data.pageData;
+          this.formatData(result.data.data.pageData);
+          this.data = result.data.data.pageData;
           this.pagination.total = result.data.data.count;
           this.loading = false;
         })
-        .catch(() => {
+        .catch((error) => {
           this.loading = false;
+          console.error(error);
         });
     },
     reset() {
@@ -272,24 +271,22 @@ export default {
         message = `确认删除“${records.name}”吗？`;
         delArgs.push(records.id);
       }
-      self.$confirm({
+      this.$confirm({
         title: message,
-        content: "注意：将删除节点与节点下面的所有子节点！",
+        content: "注意：将删除当前分组与该下面的全部子分组！",
+        okType: "danger",
         onOk() {
-          return new Promise((resolve, reject) => {
-            return request(DELETE_ARTICLECATEGORY_ITEM, METHOD.DELETE, delArgs).then((result) => {
-              let resultData = result.data;
-              if (resultData.code != 0) {
-                reject();
+          return request(DELETE_ARTICLECATEGORY_ITEM, METHOD.DELETE, delArgs)
+            .then((result) => {
+              if (result.data.code != 0) {
                 return;
               }
               self.load();
-              resolve();
               self.$message.success("删除成功");
+            })
+            .catch((err) => {
+              if (err) console.error(err);
             });
-          }).catch((err) => {
-            this.$message.error(err.message);
-          });
         },
         onCancel() {},
       });

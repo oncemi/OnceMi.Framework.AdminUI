@@ -140,12 +140,11 @@ export default {
       this.viewIdSelect = [];
       this.loading = true;
       request(GET_VIEW_CASCADER, METHOD.GET).then((result) => {
-        let resultData = result.data;
-        if (resultData.code != 0) {
+        if (result.data.code != 0) {
           return;
         }
         this.options.splice(0);
-        this.options = resultData.data;
+        this.options = result.data.data;
         this.loading = false;
         this.viewListData.splice(0);
         this.generateViewList(this.options);

@@ -183,12 +183,11 @@ export default {
       this.loading = true;
       let self = this;
       request(GET_ORGANIZE_CASCADER, METHOD.GET).then((result) => {
-        let resultData = result.data;
-        if (resultData.code != 0) {
+        if (result.data.code != 0) {
           return;
         }
         self.options.splice(0);
-        self.options = resultData.data;
+        self.options = result.data.data;
         self.organizeListData.splice(0);
         self.generateOrganizeList(self.options);
         this.setCascader("parentId", this.organizeListData, this.organizeIdSelect);

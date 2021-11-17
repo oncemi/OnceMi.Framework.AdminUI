@@ -131,17 +131,17 @@ export default {
         queryString: this.paramKeyword ?? this.paramKeyword,
       })
         .then((result) => {
-          let resultData = result.data;
-          if (resultData.code != 0) {
+          if (result.data.code != 0) {
             return;
           }
           this.data.splice(0);
-          this.data = resultData.data;
-          this.pagination.total = resultData.data.length;
+          this.data = result.data.data;
+          this.pagination.total = result.data.data.length;
           this.loading = false;
         })
-        .catch(() => {
+        .catch((error) => {
           this.loading = false;
+          console.error(error);
         });
     },
     reset() {
@@ -151,24 +151,18 @@ export default {
     },
     cleanWithConfirm(records) {
       let self = this;
-      self.$confirm({
+      this.$confirm({
         title: "此操作将清除" + records.value + "下的所有缓存，确认吗？",
         content: "“{xxx}”表示通配符",
+        okType: "danger",
         onOk() {
-          return new Promise((resolve, reject) => {
-            return request(DELETE_CACHE_LIST, METHOD.DELETE, {
-              Value: records.value,
-            }).then((result) => {
-              if (result.data.code != 0) {
-                reject();
-                return;
-              }
-              resolve();
-              self.$message.success("清理完成，共清理了" + result.data.data.count + "条缓存");
-            });
-          }).catch((err) => {
-            this.$message.error(err.message);
-            console.error(err);
+          return request(DELETE_CACHE_LIST, METHOD.DELETE, {
+            Value: records.value,
+          }).then((result) => {
+            if (result.data.code != 0) {
+              return;
+            }
+            self.$message.success("清理完成，共清理了" + result.data.data.count + "条缓存");
           });
         },
         onCancel() {},

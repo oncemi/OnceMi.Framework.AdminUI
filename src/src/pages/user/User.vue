@@ -4,7 +4,7 @@
       <a-card
         :title="$t('organizeTreeTitle')"
         :loading="loadingOrganizes"
-        style="margin-bottom: 24px;"
+        style="margin-bottom: 24px"
         :bordered="false"
         :body-style="{ padding: 0 }"
       >
@@ -46,7 +46,7 @@
     <a-col style="padding: 0 12px" :xl="18" :lg="18" :md="18" :sm="18" :xs="18">
       <a-card :title="$t('userListTitle')" style="margin-bottom: 24px" :bordered="false" :body-style="{ padding: 0 }">
         <div slot="extra">
-          <a-button @click="reload" type="link">{{ $t("refeshUserList") }}</a-button>
+          <a-button @click="load" type="link">{{ $t("refeshUserList") }}</a-button>
         </div>
         <template>
           <a-form layout="horizontal">
@@ -292,7 +292,7 @@ export default {
   },
   created() {
     this.loadRoleSelectData();
-    this.reload();
+    this.load();
   },
   watch: {
     pageSize() {
@@ -306,26 +306,25 @@ export default {
     },
   },
   methods: {
-    reload() {
-      let self = this;
+    load() {
       request(GET_ORGANIZE_SELECT_TREE, METHOD.GET).then((result) => {
         if (result.data.code != 0) {
           return;
         }
-        self.searchOrganizeValue = "";
-        self.organizeExpandedKeys.splice(0);
-        self.organizeData.splice(0);
-        self.organizeDataList.splice(0);
-        self.selectedOrganizeKeys.splice(0);
-        self.selectOrganizeId = 0;
-        self.organizeData = result.data.data;
-        self.generateOrganizeList(self.organizeData);
-        self.loadingOrganizes = false;
+        this.searchOrganizeValue = "";
+        this.organizeExpandedKeys.splice(0);
+        this.organizeData.splice(0);
+        this.organizeDataList.splice(0);
+        this.selectedOrganizeKeys.splice(0);
+        this.selectOrganizeId = 0;
+        this.organizeData = result.data.data;
+        this.generateOrganizeList(this.organizeData);
+        this.loadingOrganizes = false;
 
         //设置默认选中
-        if (self.organizeDataList && self.organizeDataList.length > 0) {
-          self.selectedOrganizeKeys.push(self.organizeDataList[0].key);
-          self.selectOrganizeId = self.organizeDataList[0].key;
+        if (this.organizeDataList && this.organizeDataList.length > 0) {
+          this.selectedOrganizeKeys.push(this.organizeDataList[0].key);
+          this.selectOrganizeId = this.organizeDataList[0].key;
         }
         //设置了watch，不用手动调用
         //self.loadUser();
@@ -334,12 +333,11 @@ export default {
     loadRoleSelectData() {
       this.roleIdSelect = [];
       request(GET_ROLE_CASCADER, METHOD.GET).then((result) => {
-        let resultData = result.data;
-        if (resultData.code != 0) {
+        if (result.data.code != 0) {
           return;
         }
         this.roleOptions.splice(0);
-        this.roleOptions = resultData.data;
+        this.roleOptions = result.data.data;
         this.roleListData.splice(0);
         this.generateRoleList(this.roleOptions);
       });
@@ -357,15 +355,14 @@ export default {
         organizeId: this.selectOrganizeId,
       })
         .then((result) => {
-          let resultData = result.data;
-          if (resultData.code != 0) {
+          if (result.data.code != 0) {
             return;
           }
 
           this.data.splice(0);
           this.selectedRowKeys.splice(0);
 
-          this.data = resultData.data.pageData;
+          this.data = result.data.data.pageData;
           this.pagination.total = result.data.data.count;
           this.loading = false;
         })
@@ -557,27 +554,24 @@ export default {
           delArgs.push(item);
         });
       } else {
-        message = `确认删除“${records.name}”吗？`;
+        message = `确认删除账户“${records.userName}”吗？`;
         delArgs.push(records.id);
       }
-      self.$confirm({
+      this.$confirm({
         title: message,
-        content: "注意：将删除节点与节点下面的所有子节点！",
+        okType: "danger",
         onOk() {
-          return new Promise((resolve, reject) => {
-            return request(DELETE_USER_ITEM, METHOD.DELETE, delArgs).then((result) => {
-              let resultData = result.data;
-              if (resultData.code != 0) {
-                reject();
+          return request(DELETE_USER_ITEM, METHOD.DELETE, delArgs)
+            .then((result) => {
+              if (result.data.code != 0) {
                 return;
               }
               self.loadUser();
-              resolve();
               self.$message.success("删除成功");
+            })
+            .catch((err) => {
+              if (err) console.error(err);
             });
-          }).catch((err) => {
-            this.$message.error(err.message);
-          });
         },
         onCancel() {},
       });

@@ -139,25 +139,30 @@ export default {
       this.apiIdSelect = [];
       this.loading = true;
       request(GET_API_CASCADER, METHOD.GET).then((result) => {
-        let resultData = result.data;
-        if (resultData.code != 0) {
+        if (result.data.code != 0) {
           return;
         }
         this.apiOptions.splice(0);
-        this.apiOptions = resultData.data;
+        this.apiOptions = result.data.data;
         this.apiListData.splice(0);
         this.generateApiList(this.apiOptions);
         this.setCascader();
-        request(GET_APIVERSION_SELECTLIST, METHOD.GET).then((orgResult) => {
-          if (orgResult.data.code != 0) {
-            return;
-          }
-          this.apiVersionsSelectList.splice(0);
-          orgResult.data.data.forEach((r) => {
-            this.apiVersionsSelectList.push(r);
+
+        request(GET_APIVERSION_SELECTLIST, METHOD.GET)
+          .then((versionResult) => {
+            if (versionResult.data.code != 0) {
+              return;
+            }
+            this.apiVersionsSelectList.splice(0);
+            versionResult.data.data.forEach((r) => {
+              this.apiVersionsSelectList.push(r);
+            });
+            this.loading = false;
+          })
+          .catch((error) => {
+            this.loading = false;
+            console.error(error);
           });
-          this.loading = false;
-        });
       });
     },
     generateApiList(data) {

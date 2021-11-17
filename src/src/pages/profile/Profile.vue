@@ -27,9 +27,7 @@
           <detail-list-item term="创建时间">{{ userInfo.createdTime }}</detail-list-item>
         </detail-list>
         <a-divider style="margin-bottom: 32px" />
-        <a-button type="primary" icon="edit" @click="edit">
-          修改信息
-        </a-button>
+        <a-button type="primary" icon="edit" @click="edit"> 修改信息 </a-button>
         <create-form ref="createModal" :visible="visible" :model="mdl" @cancel="cancel" @ok="save" />
       </a-card>
     </a-tab-pane>
@@ -68,9 +66,7 @@
           </a-form-item>
 
           <a-form-item :wrapper-col="{ span: 12, offset: 5 }">
-            <a-button type="primary" icon="save" html-type="submit">
-              保存
-            </a-button>
+            <a-button type="primary" icon="save" html-type="submit"> 保存 </a-button>
           </a-form-item>
         </a-form>
       </a-card>
@@ -266,33 +262,30 @@ export default {
     },
     handlePwdSubmit() {
       const self = this;
-      self.form.validateFields((errors, values) => {
+      this.form.validateFields((errors, values) => {
         if (!errors) {
-          self.$confirm({
+          this.$confirm({
             title: "确认更新当前密码吗?",
             onOk() {
-              return new Promise((resolve, reject) => {
-                return request(PUT_USER_PWSSWORD, METHOD.PUT, {
-                  id: values.userid,
-                  oldPassword: sha256.sha256(values.oldPassword),
-                  password: sha256.sha256(values.password),
-                }).then((result) => {
-                  let resultData = result.data;
-                  if (resultData.code != 0) {
-                    reject();
+              return request(PUT_USER_PWSSWORD, METHOD.PUT, {
+                id: values.userid,
+                oldPassword: sha256.sha256(values.oldPassword),
+                password: sha256.sha256(values.password),
+              })
+                .then((result) => {
+                  if (result.data.code != 0) {
                     return;
                   }
-                  resolve();
                   self.$message.success("密码已更新");
                   self.form.setFieldsValue({
                     oldPassword: null,
                     password: null,
                     rePassword: null,
                   });
+                })
+                .catch((err) => {
+                  if (err) console.error(err);
                 });
-              }).catch((err) => {
-                if (err) console.error(err.message);
-              });
             },
             onCancel() {},
           });

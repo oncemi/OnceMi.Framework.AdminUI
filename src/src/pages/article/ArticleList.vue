@@ -74,7 +74,7 @@
 </template>
 
 <script>
-import { GET_ARTICLE_LIST, DELETE_ARTICLE_ITEM, POST_VIEW_ITEM, PUT_VIEW_ITEM } from "@/services/api";
+import { GET_ARTICLE_LIST, DELETE_ARTICLE_ITEM } from "@/services/api";
 import { request, METHOD } from "@/utils/request";
 export default {
   name: "ViewManagement",
@@ -212,20 +212,20 @@ export default {
           typeof this.orderFiled != "undefined" && this.orderFiled.length > 0 ? `${this.orderFiled},${this.sort}` : "",
       })
         .then((result) => {
-          let resultData = result.data;
-          if (resultData.code != 0) {
+          if (result.data.code != 0) {
             return;
           }
 
           this.data.splice(0);
           this.selectedRowKeys.splice(0);
 
-          this.data = resultData.data.pageData;
+          this.data = result.data.data.pageData;
           this.pagination.total = result.data.data.count;
           this.loading = false;
         })
-        .catch(() => {
+        .catch((error) => {
           this.loading = false;
+          console.error(error);
         });
     },
     reset() {
@@ -266,23 +266,21 @@ export default {
         message = `确认删除“${records.title}”吗？`;
         delArgs.push(records.id);
       }
-      self.$confirm({
+      this.$confirm({
         title: message,
+        okType: "danger",
         onOk() {
-          return new Promise((resolve, reject) => {
-            return request(DELETE_ARTICLE_ITEM, METHOD.DELETE, delArgs).then((result) => {
-              let resultData = result.data;
-              if (resultData.code != 0) {
-                reject();
+          return request(DELETE_ARTICLE_ITEM, METHOD.DELETE, delArgs)
+            .then((result) => {
+              if (result.data.code != 0) {
                 return;
               }
-              resolve();
               self.load();
               self.$message.success("删除成功");
+            })
+            .catch((err) => {
+              if (err) console.error(err);
             });
-          }).catch((err) => {
-            this.$message.error(err.message);
-          });
         },
         onCancel() {},
       });

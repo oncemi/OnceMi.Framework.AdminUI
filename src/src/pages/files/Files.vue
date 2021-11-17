@@ -82,7 +82,6 @@ import { GET_FILE_LIST, DELETE_FILE_ITEM } from "@/services/api";
 import { request, METHOD } from "@/utils/request";
 import { mapState } from "vuex";
 import CreateForm from "./modules/CreateForm";
-import axios from "axios";
 
 export default {
   name: "FilesManagement",
@@ -200,19 +199,18 @@ export default {
           typeof this.orderFiled != "undefined" && this.orderFiled.length > 0 ? `${this.orderFiled},${this.sort}` : "",
       })
         .then((result) => {
-          let resultData = result.data;
-          if (resultData.code != 0) {
+          if (result.data.code != 0) {
             return;
           }
           this.data.splice(0);
           this.selectedRowKeys.splice(0);
-          this.data = resultData.data.pageData;
+          this.data = result.data.data.pageData;
           this.pagination.total = result.data.data.count;
           this.loading = false;
         })
-        .catch((err) => {
-          console.error(err);
+        .catch((error) => {
           this.loading = false;
+          console.error(error);
         });
     },
     reset() {
@@ -287,25 +285,22 @@ export default {
         message = `确认删除文件“${records.oldName}”吗？`;
         delArgs.push(records.id);
       }
-      self.$confirm({
+      this.$confirm({
         title: message,
         content: "注意：文件删除后无法恢复！",
+        okType: "danger",
         onOk() {
-          return new Promise((resolve, reject) => {
-            return request(DELETE_FILE_ITEM, METHOD.DELETE, delArgs).then((result) => {
-              let resultData = result.data;
-              if (resultData.code != 0) {
-                reject();
+          return request(DELETE_FILE_ITEM, METHOD.DELETE, delArgs)
+            .then((result) => {
+              if (result.data.code != 0) {
                 return;
               }
               self.load();
-              resolve();
               self.$message.success("删除成功");
+            })
+            .catch((err) => {
+              if (err) console.error(err);
             });
-          }).catch((err) => {
-            this.$message.error(err.message);
-            console.error(err);
-          });
         },
         onCancel() {},
       });

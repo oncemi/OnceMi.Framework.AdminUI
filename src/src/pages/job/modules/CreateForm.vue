@@ -221,12 +221,11 @@ export default {
       this.groupIdSelect = [];
       this.loading = true;
       request(GET_ROLE_CASCADER, METHOD.GET).then((result) => {
-        let resultData = result.data;
-        if (resultData.code != 0) {
+        if (result.data.code != 0) {
           return;
         }
         this.groupOptions.splice(0);
-        this.groupOptions = resultData.data;
+        this.groupOptions = result.data.data;
         this.groupListData.splice(0);
         this.generateGroupList(this.groupOptions);
         this.setCascader("noticeRoleId", this.groupListData, this.groupIdSelect);

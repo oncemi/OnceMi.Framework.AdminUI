@@ -2,7 +2,7 @@
   <div></div>
 </template>
 <script>
-import { userManager, getUser } from "@/services/auth";
+import { userManager } from "@/services/auth";
 import { getUserRoutes, getUserInfo, getUserRoles } from "@/services/user";
 import { loadRoutes } from "@/utils/routerUtil";
 import { mapMutations } from "vuex";
@@ -11,7 +11,6 @@ export default {
   name: "Callback",
   data() {
     return {
-      logging: false,
       error: "",
     };
   },
@@ -41,9 +40,7 @@ export default {
   },
   methods: {
     ...mapMutations("account", ["setUser", "setToken", "setPermissions", "setRoles"]),
-    afterLogin: function() {
-      this.logging = false;
-
+    afterLogin: function () {
       //获取权限配置，基于角色的
       getUserRoles()
         .then((result) => {
@@ -59,13 +56,12 @@ export default {
                 this.loginFailed(null);
                 return;
               }
-              this.logging = true;
               loadRoutes(result1.data.data);
               const redirect = this.$route.query?.redirect ? this.$route.query.redirect : "/dashboard/index";
               this.$router.push(redirect);
               this.$message.success("登录成功，欢迎回来", 3);
             })
-            .catch(function(error) {
+            .catch(function (error) {
               this.loginFailed(error);
             });
         })
@@ -73,7 +69,7 @@ export default {
           this.loginFailed(error);
         });
     },
-    loginFailed: function(error) {
+    loginFailed: function (error) {
       if (error.response && error.response.status == 403) {
         this.$router.push("/403");
         this.$message.warning("登录失败，您没有访问此页面的权限！");

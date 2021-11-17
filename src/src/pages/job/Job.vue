@@ -5,12 +5,13 @@
         <a-form layout="horizontal">
           <div :class="advanced ? null : 'fold'">
             <a-row>
-              <a-col :md="10" :sm="24" v-if="false">
-                <a-form-item label="状态" :labelCol="{ span: 5 }" :wrapperCol="{ span: 16, offset: 1 }">
-                  <a-select v-model="paramStatus" placeholder="请选择">
+              <a-col :md="8" :sm="24" style="margin-right: 8px">
+                <a-form-item label="分组" :labelCol="{ span: 5 }" :wrapperCol="{ span: 18, offset: 1 }">
+                  <a-select v-model="paramJobGroupId" placeholder="请选择">
                     <a-select-option value="">请选择</a-select-option>
-                    <a-select-option value="1">启用</a-select-option>
-                    <a-select-option value="2">禁用</a-select-option>
+                    <a-select-option v-for="item in jobGroupsSelectList" :key="item.value" :value="item.value">
+                      {{ item.name }}
+                    </a-select-option>
                   </a-select>
                 </a-form-item>
               </a-col>
@@ -112,6 +113,7 @@ import {
   POST_PAUSE_JOB,
   POST_RESUME_JOB,
   POST_TRIGGER_JOB,
+  GET_JOB_GROUP_SELECT_LIST,
 } from "@/services/api";
 import { request, METHOD } from "@/utils/request";
 import CreateForm from "./modules/CreateForm";
@@ -238,7 +240,9 @@ export default {
           this.page = page;
         },
       },
-      paramStatus: "",
+      jobGroupsSelectList: [],
+      //查询参数
+      paramJobGroupId: "",
       paramKeyword: "",
       //添加/修改弹窗
       visible: false,
@@ -262,6 +266,7 @@ export default {
     },
   },
   created() {
+    this.loadJobGroups();
     this.load(false);
   },
   mounted() {
@@ -281,33 +286,46 @@ export default {
         selt.load(true);
       }, 3000);
     },
+    loadJobGroups() {
+      //loadSelectTypes
+      request(GET_JOB_GROUP_SELECT_LIST, METHOD.GET).then((result) => {
+        if (result.data.code != 0) {
+          return;
+        }
+        this.jobGroupsSelectList.splice(0);
+        result.data.data.forEach((r) => {
+          this.jobGroupsSelectList.push(r);
+        });
+        this.loading = false;
+      });
+    },
     load(isAutoReload) {
       this.loading = !isAutoReload;
       request(GET_JOB_LIST, METHOD.GET, {
         page: this.page,
         size: this.pageSize,
         search: this.paramKeyword ?? this.paramKeyword,
+        jobGroupId: this.paramJobGroupId ?? this.paramJobGroupId,
         orderby:
           typeof this.orderFiled != "undefined" && this.orderFiled.length > 0 ? `${this.orderFiled},${this.sort}` : "",
       })
         .then((result) => {
-          let resultData = result.data;
-          if (resultData.code != 0) {
+          if (result.data.code != 0) {
             return;
           }
           this.data.splice(0);
           this.selectedRowKeys.splice(0);
-          this.data = resultData.data.pageData;
-          this.pagination.total = resultData.data.count;
+          this.data = result.data.data.pageData;
+          this.pagination.total = result.data.data.count;
           this.loading = false;
         })
         .catch((error) => {
-          //this.$message.error(error.message);
           this.loading = false;
+          console.error(error);
         });
     },
     reset() {
-      this.paramStatus = "";
+      this.paramJobGroupId = "";
       this.paramKeyword = "";
       this.load(false);
     },
@@ -376,26 +394,22 @@ export default {
     },
     stop(record) {
       let self = this;
-      self.$confirm({
+      this.$confirm({
         title: `确认停止任务【${record.name}】吗？`,
         onOk() {
-          return new Promise((resolve, reject) => {
-            request(POST_STOP_JOB, METHOD.POST, {
-              id: record.id,
-            }).then((result) => {
-              let resultData = result.data;
-              if (resultData.code != 0) {
-                reject();
+          request(POST_STOP_JOB, METHOD.POST, {
+            id: record.id,
+          })
+            .then((result) => {
+              if (result.data.code != 0) {
                 return;
               }
               self.load(false);
-              resolve();
               self.$message.info(`任务【${record.name}】已停止`);
+            })
+            .catch((err) => {
+              if (err) console.error(err);
             });
-          }).catch((err) => {
-            this.$message.error(err.message);
-            console.error(err);
-          });
         },
         onCancel() {},
       });
@@ -404,8 +418,7 @@ export default {
       request(POST_TRIGGER_JOB, METHOD.POST, {
         id: record.id,
       }).then((result) => {
-        let resultData = result.data;
-        if (resultData.code != 0) {
+        if (result.data.code != 0) {
           return;
         }
         this.load(false);
@@ -438,8 +451,7 @@ export default {
         id: record.id,
       }).then((result) => {
         this.spinning = false;
-        let resultData = result.data;
-        if (resultData.code != 0) {
+        if (result.data.code != 0) {
           return;
         }
         this.load(false);
@@ -468,24 +480,21 @@ export default {
         message = `确认删除“${records.name}”吗？`;
         delArgs.push(records.id);
       }
-      self.$confirm({
+      this.$confirm({
         title: message,
+        okType: "danger",
         onOk() {
-          return new Promise((resolve, reject) => {
-            return request(DELETE_JOB_ITEM, METHOD.DELETE, delArgs).then((result) => {
-              let resultData = result.data;
-              if (resultData.code != 0) {
-                reject();
+          return request(DELETE_JOB_ITEM, METHOD.DELETE, delArgs)
+            .then((result) => {
+              if (result.data.code != 0) {
                 return;
               }
-              resolve();
               self.$message.success("删除成功");
               self.load(false);
+            })
+            .catch((err) => {
+              if (err) console.error(err);
             });
-          }).catch((err) => {
-            this.$message.error(err.message);
-            console.error(err);
-          });
         },
         onCancel() {},
       });
@@ -497,6 +506,7 @@ export default {
       });
     },
     jobGroupClose() {
+      this.loadJobGroups();
       this.jobGroupVisible = false;
     },
     handleMenuClick(e, record) {

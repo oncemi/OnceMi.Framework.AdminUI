@@ -10,7 +10,7 @@
       </div>
       <div class="login">
         <a-form @submit="onSubmit" :form="form">
-          <a-tabs size="large" :tabBarStyle="{ textAlign: 'center' }" style="padding: 0 2px;">
+          <a-tabs size="large" :tabBarStyle="{ textAlign: 'center' }" style="padding: 0 2px">
             <a-tab-pane tab="账户密码登录" key="1">
               <a-alert
                 type="error"
@@ -18,7 +18,7 @@
                 v-show="error"
                 :message="error"
                 showIcon
-                style="margin-bottom: 24px;"
+                style="margin-bottom: 24px"
               />
               <a-form-item>
                 <a-input
@@ -69,7 +69,7 @@
           <a-form-item>
             <a-button
               :loading="logging"
-              style="width: 100%;margin-top: 24px"
+              style="width: 100%; margin-top: 24px"
               size="large"
               htmlType="submit"
               type="primary"
@@ -116,7 +116,7 @@ export default {
     ...mapState("setting", ["isEnabledIdentityServer", "systemName"]),
     ...mapState("account", ["token"]),
   },
-  mounted: async function() {
+  mounted: async function () {
     if (checkAuthorization()) {
       this.afterLoginRedirect();
     } else {
@@ -149,44 +149,49 @@ export default {
             Username: name,
             Password: sha256.sha256(password),
             Captcha: "123456",
-          }).then((result) => {
-            if (result.data.code != 0) {
+          })
+            .then((result) => {
+              if (!result || result.data.code != 0) {
+                this.logging = false;
+                return;
+              }
+              let userToken = {
+                access_token: result.data.data.accessToken,
+                refresh_token: result.data.data.refreshToken,
+                token_type: result.data.data.tokenType,
+                expires_at: result.data.data.expiresAt,
+                profile: result.data.data.profile,
+                isRemember: this.isRemember,
+              };
+              let userInfo = {
+                id: result.data.data.profile.id,
+                name: result.data.data.profile.userName,
+                nickName: result.data.data.profile.nickName,
+                avatar: result.data.data.profile.avatar,
+                address: result.data.data.profile.address,
+                position: {
+                  CN: "未知",
+                  HK: "未知",
+                  US: "Unknow",
+                },
+              };
+              if (userInfo.avatar == null || userInfo.avatar == "") {
+                userInfo.avatar = GETAVATAR + "/" + userInfo.name;
+              }
+              //set user info
+              this.setUser(userInfo);
+              //set token
+              this.setToken(userToken);
+              this.afterLogin();
+            })
+            .catch((error) => {
               this.logging = false;
-              return;
-            }
-            let userToken = {
-              access_token: result.data.data.accessToken,
-              refresh_token: result.data.data.refreshToken,
-              token_type: result.data.data.tokenType,
-              expires_at: result.data.data.expiresAt,
-              profile: result.data.data.profile,
-              isRemember: this.isRemember,
-            };
-            let userInfo = {
-              id: result.data.data.profile.id,
-              name: result.data.data.profile.userName,
-              nickName: result.data.data.profile.nickName,
-              avatar: result.data.data.profile.avatar,
-              address: result.data.data.profile.address,
-              position: {
-                CN: "未知",
-                HK: "未知",
-                US: "Unknow",
-              },
-            };
-            if (userInfo.avatar == null || userInfo.avatar == "") {
-              userInfo.avatar = GETAVATAR + "/" + userInfo.name;
-            }
-            //set user info
-            this.setUser(userInfo);
-            //set token
-            this.setToken(userToken);
-            this.afterLogin();
-          });
+              console.error(error);
+            });
         }
       });
     },
-    afterLogin: function() {
+    afterLogin: function () {
       this.logging = false;
       //获取权限配置，基于角色的
       getUserRoles()
@@ -209,7 +214,7 @@ export default {
               this.$router.push(redirect);
               this.$message.success("登录成功，欢迎回来", 3);
             })
-            .catch(function(error) {
+            .catch(function (error) {
               this.loginFailed(error);
             });
         })
@@ -225,11 +230,11 @@ export default {
           const redirect = self.$route.query?.redirect ? self.$route.query.redirect : "/dashboard/index";
           self.$router.push(redirect);
         })
-        .catch(function(error) {
+        .catch(function (error) {
           this.loginFailed(error);
         });
     },
-    loginFailed: function(error) {
+    loginFailed: function (error) {
       console.error(error);
       if (error.response && error.response.status == 403) {
         this.$router.push("/403");

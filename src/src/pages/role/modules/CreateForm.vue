@@ -140,23 +140,21 @@ export default {
       this.loading = true;
 
       request(GET_ROLE_CASCADER, METHOD.GET).then((result) => {
-        let resultData = result.data;
-        if (resultData.code != 0) {
+        if (result.data.code != 0) {
           return;
         }
         this.roleOptions.splice(0);
-        this.roleOptions = resultData.data;
+        this.roleOptions = result.data.data;
         this.roleListData.splice(0);
         this.generateRoleList(this.roleOptions);
         this.setCascader("parentId", this.roleListData, this.roleIdSelect);
 
         request(GET_ORGANIZE_CASCADER, METHOD.GET).then((orgResult) => {
-          let resultData = orgResult.data;
-          if (resultData.code != 0) {
+          if (orgResult.data.code != 0) {
             return;
           }
           this.organizeOptions.splice(0);
-          this.organizeOptions = resultData.data;
+          this.organizeOptions = orgResult.data.data;
           this.organizeListData.splice(0);
           this.generateOrganizeList(this.organizeOptions);
           this.setCascader("organizeId", this.organizeListData, this.organizeIdSelect);

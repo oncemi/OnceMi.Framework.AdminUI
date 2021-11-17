@@ -35,10 +35,10 @@
             </a-form-item>
           </a-form>
         </a-col>
-        <a-col :span="12" style="text-align: right;margin-top: 3px;">
+        <a-col :span="12" style="text-align: right; margin-top: 3px">
           <a-space>
             <a-button icon="save" @click="handleSubmit(true)">保存草稿</a-button>
-            <a-button type="primary" icon="check" @click="handleSubmit(false)" style="width: 110px;">发布</a-button>
+            <a-button type="primary" icon="check" @click="handleSubmit(false)" style="width: 110px">发布</a-button>
           </a-space>
         </a-col>
       </a-row>
@@ -48,9 +48,7 @@
         </div>
       </a-row>
       <a-row>
-        <a-divider orientation="left">
-          文章设置
-        </a-divider>
+        <a-divider orientation="left"> 文章设置 </a-divider>
         <a-col :span="12">
           <a-form :form="formArticleSetting" v-bind="formLayout">
             <a-form-item label="评论开关">
@@ -93,9 +91,7 @@
                 <img v-if="coverImageData && coverImageData.url" :src="coverImageData.url" alt="avatar" />
                 <div v-else>
                   <a-icon :type="coverLoading ? 'loading' : 'plus'" />
-                  <div class="ant-upload-text">
-                    上传封面
-                  </div>
+                  <div class="ant-upload-text">上传封面</div>
                 </div>
               </a-upload>
             </a-form-item>
@@ -249,7 +245,7 @@ export default {
         //文件上传参数设置
         attachment_max_size: 2048 * 1024 * 1024, //2G
         attachment_assets_path: "/tinymce/plugins/attachment/assets/icons/",
-        images_upload_handler: function(file, successCallback, failureCallback) {
+        images_upload_handler: function (file, successCallback, failureCallback) {
           let fileName = file.filename();
           if (!fileName) {
             fileName = uuidv4() + ".jpg";
@@ -261,36 +257,46 @@ export default {
           let config = {
             headers: { "Content-Type": "multipart/form-data" },
           };
-          request(POST_FILE_ITEM, METHOD.POST, param, config).then((result) => {
-            if (result.data.code != 0) {
-              failureCallback(result.data.message);
-              return;
-            }
-            if (!result.data.data || result.data.data.length == 0) {
-              failureCallback("图片上传失败");
-              return;
-            }
-            successCallback(result.data.data[0].url);
-          });
+          request(POST_FILE_ITEM, METHOD.POST, param, config)
+            .then((result) => {
+              if (result.data.code != 0) {
+                failureCallback(result.data.message);
+                return;
+              }
+              if (!result.data.data || result.data.data.length == 0) {
+                failureCallback("图片上传失败");
+                return;
+              }
+              successCallback(result.data.data[0].url);
+            })
+            .catch((error) => {
+              failureCallback("图片上传失败, " + error.message);
+              console.error(error);
+            });
         },
-        attachment_upload_handler: function(file, successCallback, failureCallback) {
+        attachment_upload_handler: function (file, successCallback, failureCallback) {
           let param = new FormData();
           param.append("file", file);
           param.append("AccessMode", "PublicRead");
           let config = {
             headers: { "Content-Type": "multipart/form-data" },
           };
-          request(POST_FILE_ITEM, METHOD.POST, param, config).then((result) => {
-            if (result.data.code != 0) {
-              failureCallback(result.data.message);
-              return;
-            }
-            if (!result.data.data || result.data.data.length == 0) {
-              failureCallback("图片上传失败");
-              return;
-            }
-            successCallback(result.data.data[0].url);
-          });
+          request(POST_FILE_ITEM, METHOD.POST, param, config)
+            .then((result) => {
+              if (result.data.code != 0) {
+                failureCallback(result.data.message);
+                return;
+              }
+              if (!result.data.data || result.data.data.length == 0) {
+                failureCallback("图片上传失败");
+                return;
+              }
+              successCallback(result.data.data[0].url);
+            })
+            .catch((error) => {
+              failureCallback("图片上传失败, " + error.message);
+              console.error(error);
+            });
         },
       },
     };
@@ -311,11 +317,10 @@ export default {
 
       //加载分类
       request(GET_ARTICLECATEGORY_CASCADER, METHOD.GET).then((categoryResult) => {
-        let resultData = categoryResult.data;
-        if (resultData.code != 0) {
+        if (categoryResult.data.code != 0) {
           return;
         }
-        this.articleCategoryTreeData = resultData.data;
+        this.articleCategoryTreeData = categoryResult.data.data;
         //加载Tag
         request(GET_ARTICLE_TAGS_SELECTLIST, METHOD.GET).then((tagsResult) => {
           if (tagsResult.data.code != 0) {
@@ -424,6 +429,7 @@ export default {
           this.loading = true;
           request(POST_PUT_ARTICLE_ITEM, method, data)
             .then((result) => {
+              this.loading = false;
               if (result.data.code != 0) {
                 return;
               }
@@ -431,7 +437,6 @@ export default {
                 //新建的话会传回文章Id
                 this.articleId = result.data.data.id;
               }
-              this.loading = false;
               let self = this;
               if (data.IsDraft) {
                 this.$message.success("草稿已保存");
@@ -446,8 +451,9 @@ export default {
                 });
               }
             })
-            .catch((err) => {
-              console.error(err);
+            .catch((error) => {
+              this.loading = false;
+              console.error(error);
             });
         });
       });
@@ -459,13 +465,17 @@ export default {
       let config = {
         headers: { "Content-Type": "multipart/form-data" },
       };
-      request(POST_FILE_ITEM, METHOD.POST, param, config).then((result) => {
-        if (result.data.code != 0) {
-          data.onError(new Error(result.data.message), result.data);
-          return;
-        }
-        data.onSuccess(result.data, data.file);
-      });
+      request(POST_FILE_ITEM, METHOD.POST, param, config)
+        .then((result) => {
+          if (result.data.code != 0) {
+            data.onError(new Error(result.data.message), result.data);
+            return;
+          }
+          data.onSuccess(result.data, data.file);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     },
     handleCoverUpload(info) {
       if (info.file.status === "error") {
@@ -495,8 +505,7 @@ export default {
         if (id && id > 0) {
           //删除之前上传的
           request(DELETE_FILE_ITEM, METHOD.DELETE, [id]).then((result) => {
-            let resultData = result.data;
-            if (resultData.code != 0) {
+            if (result.data.code != 0) {
               return;
             }
           });

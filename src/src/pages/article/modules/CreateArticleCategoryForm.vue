@@ -119,18 +119,22 @@ export default {
       this.categoryIdSelect = [];
       this.loading = true;
       let self = this;
-      request(GET_ARTICLECATEGORY_CASCADER, METHOD.GET).then((result) => {
-        let resultData = result.data;
-        if (resultData.code != 0) {
-          return;
-        }
-        self.options.splice(0);
-        self.options = resultData.data;
-        self.categoryListData.splice(0);
-        self.generateCategoryList(self.options);
-        this.setCascader("parentId", this.categoryListData, this.categoryIdSelect);
-        this.loading = false;
-      });
+      request(GET_ARTICLECATEGORY_CASCADER, METHOD.GET)
+        .then((result) => {
+          if (result.data.code != 0) {
+            return;
+          }
+          self.options.splice(0);
+          self.options = result.data.data;
+          self.categoryListData.splice(0);
+          self.generateCategoryList(self.options);
+          this.setCascader("parentId", this.categoryListData, this.categoryIdSelect);
+          this.loading = false;
+        })
+        .catch((error) => {
+          this.loading = false;
+          console.error(error);
+        });
     },
     generateCategoryList(data) {
       for (let i = 0; i < data.length; i++) {

@@ -4,12 +4,12 @@
       <a-card
         :title="$t('roleList')"
         :loading="loadingRoles"
-        style="margin-bottom: 24px;"
+        style="margin-bottom: 24px"
         :bordered="false"
         :body-style="{ padding: 0 }"
       >
         <div slot="extra">
-          <a-button @click="reload" type="link" class="display-role-refesh" cl>{{ $t("refeshRole") }}</a-button>
+          <a-button @click="load" type="link" class="display-role-refesh" cl>{{ $t("refeshRole") }}</a-button>
         </div>
         <div>
           <template>
@@ -57,7 +57,7 @@
         :body-style="{ padding: 0 }"
       >
         <div slot="extra">
-          <a-button @click="reload" type="link">{{ $t("refeshPermissions") }}</a-button>
+          <a-button @click="load" type="link">{{ $t("refeshPermissions") }}</a-button>
           <a-button @click="save" type="link">{{ $t("save") }}</a-button>
         </div>
         <div>
@@ -119,7 +119,7 @@ export default {
     };
   },
   created() {
-    this.reload();
+    this.load();
   },
   watch: {
     checkedKeys(val) {
@@ -128,32 +128,31 @@ export default {
     },
   },
   methods: {
-    reload() {
-      let self = this;
+    load() {
       request(GET_PERMISSION_LIST, METHOD.GET).then((result) => {
         if (result.data.code != 0) {
           return;
         }
-        self.searchRoleValue = "";
-        self.roleExpandedKeys.splice(0);
-        self.roleData.splice(0);
-        self.roleDataList.splice(0);
-        self.selectedRoleKeys.splice(0);
-        self.roleData = result.data.data.roles;
-        self.generateRoleList(self.roleData);
-        self.loadingRoles = false;
+        this.searchRoleValue = "";
+        this.roleExpandedKeys.splice(0);
+        this.roleData.splice(0);
+        this.roleDataList.splice(0);
+        this.selectedRoleKeys.splice(0);
+        this.roleData = result.data.data.roles;
+        this.generateRoleList(this.roleData);
+        this.loadingRoles = false;
 
-        self.expandedPermissionKeys.splice(0);
-        self.selectedKeys.splice(0);
-        self.checkedKeys.checked.splice(0);
-        self.permissionData.splice(0);
-        self.autoExpandPermissionParent = false;
-        self.permissionData = result.data.data.menus;
-        self.generatePermissionList(self.permissionData);
-        self.loadingPermissions = false;
+        this.expandedPermissionKeys.splice(0);
+        this.selectedKeys.splice(0);
+        this.checkedKeys.checked.splice(0);
+        this.permissionData.splice(0);
+        this.autoExpandPermissionParent = false;
+        this.permissionData = result.data.data.menus;
+        this.generatePermissionList(this.permissionData);
+        this.loadingPermissions = false;
 
-        self.selectRoleId = 0;
-        self.disabled = true;
+        this.selectRoleId = 0;
+        this.disabled = true;
       });
     },
     save() {
@@ -169,12 +168,16 @@ export default {
         roleId: this.selectRoleId,
         permissions: this.checkedKeys.checked,
       };
-      request(PUT_ROLE_PERMISSION, METHOD.PUT, putData).then((result) => {
-        if (result.data.code != 0) {
-          return;
-        }
-        this.$message.success("保存成功");
-      });
+      request(PUT_ROLE_PERMISSION, METHOD.PUT, putData)
+        .then((result) => {
+          if (result.data.code != 0) {
+            return;
+          }
+          this.$message.success("保存成功");
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     },
     onRoleTreeExpand(expandedKeys) {
       this.roleExpandedKeys = expandedKeys;
