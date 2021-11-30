@@ -187,9 +187,21 @@ export default {
     deleteRecord: "delete",
   },
   created() {
+    this.loadApiVersion();
     this.load();
   },
   methods: {
+    loadApiVersion() {
+      request(GET_APIVERSION_SELECTLIST, METHOD.GET).then((result) => {
+        if (result.data.code != 0) {
+          return;
+        }
+        this.apiVersionsSelectList.splice(0);
+        result.data.data.forEach((r) => {
+          this.apiVersionsSelectList.push(r);
+        });
+      });
+    },
     load() {
       this.loading = true;
       request(GET_API_LIST, METHOD.GET, {
@@ -218,16 +230,6 @@ export default {
           this.loading = false;
           console.error(error);
         });
-
-      request(GET_APIVERSION_SELECTLIST, METHOD.GET).then((result) => {
-        if (result.data.code != 0) {
-          return;
-        }
-        this.apiVersionsSelectList.splice(0);
-        result.data.data.forEach((r) => {
-          this.apiVersionsSelectList.push(r);
-        });
-      });
     },
     reset() {
       this.paramApiVersion = "";
@@ -240,13 +242,17 @@ export default {
         title: "同步系统API?",
         content: "将自动发现系统中的API并同步到数据库中。",
         onOk() {
-          return request(RESOLVE_API_ITEM, METHOD.POST).then((result) => {
-            if (result.data.code != 0) {
-              return;
-            }
-            self.$message.success("接口同步成功");
-            self.load();
-          });
+          return request(RESOLVE_API_ITEM, METHOD.POST)
+            .then((result) => {
+              if (result.data.code != 0) {
+                return;
+              }
+              self.$message.success("接口同步成功");
+              self.load();
+            })
+            .catch((err) => {
+              if (err) console.error(err);
+            });
         },
         onCancel() {},
       });
@@ -349,7 +355,7 @@ export default {
           return request(DELETE_API_ITEM, METHOD.DELETE, delArgs)
             .then((result) => {
               if (result.data.code != 0) {
-                return false;
+                return;
               }
               self.load();
               self.$message.success("删除成功");

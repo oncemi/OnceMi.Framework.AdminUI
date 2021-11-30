@@ -5,6 +5,7 @@
         <detail-list-item term="操作系统">{{ hardwareInfo.osDescription }}</detail-list-item>
         <detail-list-item term="操作系统架构">{{ hardwareInfo.osArchitecture }}</detail-list-item>
         <detail-list-item term="应用程序架构">{{ hardwareInfo.processArchitecture }}</detail-list-item>
+        <detail-list-item term=".NET版本">{{ hardwareInfo.frameworkDescription }}</detail-list-item>
         <detail-list-item term="内存总数">{{ hardwareInfo.totalPhysicalMemory }} MB</detail-list-item>
         <detail-list-item term="空闲内存">{{ hardwareInfo.availablePhysicalMemory }} MB</detail-list-item>
         <detail-list-item term="应用程序占用">{{ hardwareInfo.processUsedMemory }} MB</detail-list-item>

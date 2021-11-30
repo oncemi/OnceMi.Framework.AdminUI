@@ -44,6 +44,14 @@
           rowKey="value"
           @change="onChange"
         >
+          <span slot="ellipsisCol" slot-scope="text">
+            <a-tooltip placement="topLeft" :autoAdjustOverflow="true">
+              <template slot="title">
+                {{ text }}
+              </template>
+              {{ text }}
+            </a-tooltip>
+          </span>
           <span slot="options" slot-scope="text, record">
             <div>
               <a-button type="danger" size="small" @click="cleanWithConfirm(record)">清理</a-button>
@@ -80,6 +88,7 @@ export default {
           title: "描述",
           dataIndex: "description",
           ellipsis: true,
+          scopedSlots: { customRender: "ellipsisCol" },
         },
         {
           title: "操作",
@@ -152,8 +161,8 @@ export default {
     cleanWithConfirm(records) {
       let self = this;
       this.$confirm({
-        title: "此操作将清除" + records.value + "下的所有缓存，确认吗？",
-        content: "“{xxx}”表示通配符",
+        title: "此操作将清除“" + records.value + "”下的所有缓存，确认吗？",
+        content: "“{x}”表示通配符",
         okType: "danger",
         onOk() {
           return request(DELETE_CACHE_LIST, METHOD.DELETE, {

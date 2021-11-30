@@ -18,7 +18,7 @@
     "
   >
     <a-spin :spinning="loading">
-      <a-form :form="form" v-bind="formLayout">
+      <a-form :form="form" v-bind="formLayout" style="margin-top: 8px">
         <a-form-item v-show="false" label="主键ID">
           <a-input v-decorator="['id', { initialValue: 0 }]" disabled />
         </a-form-item>

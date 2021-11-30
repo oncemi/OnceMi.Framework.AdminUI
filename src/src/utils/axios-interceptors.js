@@ -15,7 +15,7 @@ const resperr = {
     }
     const code = response.data?.code;
     if (code && code != 0) {
-      message.warning(`${response.data.message}(错误码：${response.data.code})`);
+      message.warning(`${response.data.message}(${response.data.code})`);
     }
     return response;
   },
@@ -88,7 +88,7 @@ const reqCommon = {
    * @returns {*}
    */
   async onFulfilled(config, options) {
-    let requestUrlInIgnoreList = function(url) {
+    let requestUrlInIgnoreList = function (url) {
       if (!url) {
         return false;
       }
@@ -101,7 +101,7 @@ const reqCommon = {
       }
       return false;
     };
-    let requestFailed = function() {
+    let requestFailed = function () {
       message.warning("认证已过期，请重新登录");
       window.location.replace("/");
       return Promise.reject();
