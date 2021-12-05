@@ -1,7 +1,7 @@
 <template>
   <a-modal
     :title="title"
-    :width="900"
+    :width="1000"
     :visible="visible"
     :maskClosable="false"
     :footer="null"
@@ -24,6 +24,11 @@
         rowKey="id"
         @change="onTableChange"
       >
+        <span slot="jobHistoryStatus" slot-scope="text, record">
+          <p :style="getJobHistoryStatusColor(record.status)">
+            {{ text }}
+          </p>
+        </span>
         <span slot="ellipsisCol" slot-scope="text">
           <a-tooltip
             placement="topLeft"
@@ -93,7 +98,8 @@ export default {
         {
           title: "执行状态",
           dataIndex: "statusName",
-          width: 80,
+          width: 100,
+          scopedSlots: { customRender: "jobHistoryStatus" },
         },
         {
           title: "执行结果（鼠标悬停查看完整结果）",
@@ -135,6 +141,17 @@ export default {
     },
   },
   methods: {
+    getJobHistoryStatusColor(status) {
+      switch (status) {
+        case 1:
+          return "color: green;";
+        case 2:
+          return "color: red;";
+        case 3:
+        default:
+          return "";
+      }
+    },
     load(jobId) {
       this.loading = true;
       if (!jobId || jobId == 0) {
