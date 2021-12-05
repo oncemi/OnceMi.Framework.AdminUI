@@ -245,6 +245,7 @@ export default {
           articleId: record.id,
         },
       });
+      this.$refreshPage("/articles/articleEdit");
     },
     deleteSelectItems() {
       if (this.selectedRowKeys.length == 0) {

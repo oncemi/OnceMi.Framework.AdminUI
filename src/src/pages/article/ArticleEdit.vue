@@ -332,6 +332,7 @@ export default {
           });
 
           if (this.articleId && this.articleId > 0) {
+            this.pageTitle = "编辑文章";
             //获取文章信息
             request(`${GET_ARTICLE_ITEM}/${this.articleId}`, METHOD.GET).then((result) => {
               if (result.data.code != 0) {
