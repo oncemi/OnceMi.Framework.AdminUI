@@ -138,14 +138,25 @@ export default {
     },
     handleChange(info) {
       const status = info.file.status;
-      if (status === "done") {
-        this.$message.success(`【${info.file.name}】上传成功`);
-      } else if (status === "error") {
-        this.$message.error(`【${info.file.name}】上传失败`);
+      if (status === "done" && info.file.response) {
+        if (info.file.response.code == 0) {
+          this.$message.success(`【${info.file.name}】上传成功`);
+        } else {
+          if (info.file.response.message) {
+            this.$message.error(
+              `【${info.file.name}】上传失败，${info.file.response.message}(${info.file.response.code})`
+            );
+          } else {
+            this.$message.error(`【${info.file.name}】上传失败`);
+          }
+          info.file.status = "error";
+        }
+        return;
       }
+
       let fileList = [...info.fileList];
       fileList = fileList.map((file) => {
-        if (file.response) {
+        if (file.response && info.file.response.code == 0) {
           // Component will show file.url as link
           file.url = file.response.url;
         }
