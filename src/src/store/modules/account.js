@@ -98,7 +98,11 @@ export default {
     },
     setRoutesConfig(state, routesConfig) {
       state.routesConfig = routesConfig;
-      localStorage.setItem(process.env.VUE_APP_ROUTES_KEY, JSON.stringify(routesConfig));
+      if (routesConfig) {
+        localStorage.setItem(process.env.VUE_APP_ROUTES_KEY, JSON.stringify(routesConfig));
+      } else {
+        localStorage.removeItem(process.env.VUE_APP_ROUTES_KEY);
+      }
     },
   },
 };

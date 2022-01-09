@@ -12,13 +12,13 @@ export default {
   computed: {
     ...mapState("setting", ["isEnabledIdentityServer"]),
   },
-  mounted: async function() {
+  mounted: async function () {
     if (this.isEnabledIdentityServer) {
       await logout().then((result) => {
         this.$router.push("/login");
       });
     } else {
-      localLogout();
+      await localLogout();
       this.$router.push("/login");
     }
   },

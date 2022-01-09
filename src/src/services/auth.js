@@ -1,5 +1,5 @@
 import { UserManager, WebStorageStateStore } from "oidc-client";
-import { POST_LOGOUT, POST_REFESH_TOKEN } from "@/services/api";
+import { GET_LOGOUT, POST_REFESH_TOKEN } from "@/services/api";
 import { request, METHOD } from "@/utils/request";
 import store from "@/store";
 
@@ -257,17 +257,12 @@ class localAccount {
     localStorage.removeItem(process.env.VUE_APP_ROUTES_KEY);
     localStorage.removeItem(process.env.VUE_APP_PERMISSIONS_KEY);
     localStorage.removeItem(process.env.VUE_APP_ROLES_KEY);
-
-    let token = store.getters["account/token"];
     //clean
     store.commit("account/setToken", null);
-    //store.commit("account/setUser", null);
-
-    if (token && token.refresh_token) {
-      await request(POST_LOGOUT, METHOD.POST, {
-        Token: token.refresh_token,
-      });
-    }
+    store.commit("account/setUser", null);
+    store.commit("account/setRoutesConfig", null);
+    //调用登出
+    await request(GET_LOGOUT, METHOD.GET);
   };
 }
 

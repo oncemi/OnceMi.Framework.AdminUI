@@ -5,7 +5,7 @@ const BASE_URL = process.env.VUE_APP_API_BASE_URL;
 module.exports = {
   //Account
   POST_LOGIN: `${BASE_URL}/api/v1/Account/Login`,
-  POST_LOGOUT: `${BASE_URL}/api/v1/Account/RevokeToken`,
+  GET_LOGOUT: `${BASE_URL}/api/v1/Account/Logout`,
   POST_REFESH_TOKEN: `${BASE_URL}/api/v1/Account/RefeshToken`,
   //Permission
   GET_USER_ROLE_PERMISSION: `${BASE_URL}/api/v1/Permission/RolePermission`, //角色权限列表
