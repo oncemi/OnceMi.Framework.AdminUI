@@ -1,4 +1,4 @@
-FROM node:16.13.0-bullseye-slim AS builder
+FROM node:16.14.2-bullseye-slim AS builder
 WORKDIR /app
 
 COPY . /app

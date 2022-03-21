@@ -254,15 +254,15 @@ class localAccount {
   };
 
   logout = async () => {
+    //调用登出
+    await request(GET_LOGOUT, METHOD.GET);
+    //remove cache
     localStorage.removeItem(process.env.VUE_APP_ROUTES_KEY);
     localStorage.removeItem(process.env.VUE_APP_PERMISSIONS_KEY);
     localStorage.removeItem(process.env.VUE_APP_ROLES_KEY);
-    //clean
     store.commit("account/setToken", null);
     store.commit("account/setUser", null);
     store.commit("account/setRoutesConfig", null);
-    //调用登出
-    await request(GET_LOGOUT, METHOD.GET);
   };
 }
 
