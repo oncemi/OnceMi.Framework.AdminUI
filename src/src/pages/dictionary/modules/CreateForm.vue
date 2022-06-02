@@ -116,15 +116,14 @@ export default {
         return;
       }
       //pick 从model中取出表单中对应值
-      if (this.model.type === "update") {
-        this.title = "编辑数据字典";
+      this.title = this.model.type === "update" ? "编辑数据字典" : "新建数据字典";
+      if (this.model.data) {
         this.form.setFieldsValue(pick(this.model.data, this.fields));
         this.load();
         if (this.model.data.parentId && this.model.data.parentId > 0) {
           this.loadMaxSort(this.model.data.parentId);
         }
       } else {
-        this.title = "新建数据字典";
         this.load();
       }
     });

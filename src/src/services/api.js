@@ -32,7 +32,7 @@ module.exports = {
   DELETE_API_ITEM: `${BASE_URL}/api/v1/Api`,
   POST_API_ITEM: `${BASE_URL}/api/v1/Api`,
   PUT_API_ITEM: `${BASE_URL}/api/v1/Api`,
-  RESOLVE_API_ITEM: `${BASE_URL}/api/v1/Api/Resolve`,
+  SYNC_API_ITEM: `${BASE_URL}/api/v1/Api/Sync`,
   GET_APIVERSION_SELECTLIST: `${BASE_URL}/api/v1/Api/ApiVersions`,
   GET_API_CASCADER: `${BASE_URL}/api/v1/Api/CascaderList`,
   //Organize

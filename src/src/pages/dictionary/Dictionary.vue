@@ -62,12 +62,12 @@
         style="margin-bottom: 24px"
         :loading="loadingDictionarys"
         :bordered="false"
-        :body-style="{ padding: 0, height: '565px' }"
+        :body-style="{ padding: 0 }"
       >
         <div slot="extra">
           <a-button @click="load" type="link">{{ $t("refeshDictionaryList") }}</a-button>
         </div>
-        <template>
+        <template v-if="selectDictionaryId > 0">
           <a-spin :spinning="loading">
             <a-form :form="form" v-bind="formItemLayout" @submit="saveDicDetail" style="padding: 24px 10px">
               <a-form-item v-show="false" label="主键ID">
@@ -108,9 +108,12 @@
               </a-form-item>
             </a-form>
           </a-spin>
-          <create-form ref="createModal" :visible="visible" :model="mdl" @cancel="cancel" @ok="save" />
+        </template>
+        <template v-else>
+          <a-empty />
         </template>
       </a-card>
+      <create-form ref="createModal" :visible="visible" :model="mdl" @cancel="cancel" @ok="save" />
     </a-col>
   </a-row>
 </template>
@@ -312,7 +315,7 @@ export default {
       this.visible = true;
       this.$nextTick(() => {
         if (this.selectDictionaryId && this.selectDictionaryId > 0) {
-          this.mdl = { type: "update", data: { parentId: this.selectDictionaryId } };
+          this.mdl = { type: "create", data: { parentId: this.selectDictionaryId } };
         } else {
           this.mdl = { type: "create", data: null };
         }

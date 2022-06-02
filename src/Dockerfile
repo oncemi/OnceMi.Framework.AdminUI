@@ -1,4 +1,4 @@
-FROM node:16.14.2-bullseye-slim AS builder
+FROM node:16-alpine AS builder
 WORKDIR /app
 
 COPY . /app
@@ -15,4 +15,4 @@ COPY --from=builder /app/dist .
 RUN chmod -R a+rx *
 
 # Donwload nginx.conf from url
-ADD ["https://gitee.com/withsalt/vue-docker-deloy/raw/master/nginx.conf", "/etc/nginx/conf.d/default.conf"]
+ADD ["https://raw.githubusercontent.com/oncemi/OnceMi.Framework.AdminUI/main/docs/docker/nginx/nginx.conf", "/etc/nginx/conf.d/default.conf"]

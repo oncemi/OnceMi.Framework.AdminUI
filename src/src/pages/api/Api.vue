@@ -87,7 +87,7 @@ import {
   DELETE_API_ITEM,
   POST_API_ITEM,
   PUT_API_ITEM,
-  RESOLVE_API_ITEM,
+  SYNC_API_ITEM,
   GET_APIVERSION_SELECTLIST,
 } from "@/services/api";
 import { request, METHOD } from "@/utils/request";
@@ -242,7 +242,7 @@ export default {
         title: "同步系统API?",
         content: "将自动发现系统中的API并同步到数据库中。",
         onOk() {
-          return request(RESOLVE_API_ITEM, METHOD.POST)
+          return request(SYNC_API_ITEM, METHOD.POST)
             .then((result) => {
               if (result.data.code != 0) {
                 return;

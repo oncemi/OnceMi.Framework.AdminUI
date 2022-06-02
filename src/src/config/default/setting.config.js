@@ -31,7 +31,7 @@ module.exports = {
   },
   footerLinks: [
     //页面底部链接，{link: '链接地址', name: '名称/显示文字', icon: '图标，支持 ant design vue 图标库'}
-    { link: "https://doc.oncemi.com/web/#/5", name: "文档" },
+    { link: "https://docs.oncemi.com/web/#/5", name: "文档" },
     { link: "https://github.com/oncemi/OnceMi.Framework", icon: "github" },
     { link: "https://www.oncemi.com", name: "猿米科技" },
   ],
